@@ -155,7 +155,7 @@ class Simon(Actor):
 
         self.move = 2
         self.gravity = 3
-        self.jump_height = 80
+        self.jump_height = 60
         self.velocity = 0
         self.sjmod = 1
         self.tip = 0
