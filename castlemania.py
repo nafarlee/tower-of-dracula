@@ -1,6 +1,6 @@
 '''Castlevania Tower Defense Game'''
 __author__ = 'farley'
-import pygame, sys
+import pygame, sys, os
 from pygame.locals import *
 
 FPS = 60
@@ -12,7 +12,6 @@ def main():
     '''Run the game with default settings'''
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption('Vania')
 
     pygame.mixer.music.load("sounds/vamp.mp3")
     pygame.mixer.music.play(-1)
@@ -36,23 +35,6 @@ def main():
     world = World(playerx, playery)
 
     while True:
-        screen.fill(BG_COLOR)
-        camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
-        screen.blit(world.background, (-camerax, -cameray))
-
-        world.simon.update(inputs, world)
-        
-        for sprite in world.all_sprites:
-            if camera.colliderect(sprite.rect):
-                screen.blit(sprite.image, (sprite.rect.x-camera.x,
-                            sprite.rect.y-camera.y))
-
-        if masker:
-            for box in world.obstacles:
-                if box.colliderect(camera):
-                    pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
-                                     box.y-camera.y, box.width, box.height))
-
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -105,8 +87,26 @@ def main():
                     inputs["b"] = False
 
 
+        world.simon.update(inputs, world)
+
+
+        camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
+        screen.fill(BG_COLOR)
+        screen.blit(world.background, (-camerax, -cameray))
+        if masker:
+            for box in world.obstacles:
+                if box.colliderect(camera):
+                    pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
+                                     box.y-camera.y, box.width, box.height))
+        for sprite in world.all_sprites:
+            if camera.colliderect(sprite.rect):
+                screen.blit(sprite.image, (sprite.rect.x-camera.x,
+                            sprite.rect.y-camera.y))
+
+
         pygame.display.flip()
         fpsclock.tick(FPS)
+        pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
 
 
 class World(object):
@@ -140,8 +140,8 @@ class Simon(Actor):
     '''Class that represents player 1 in the game world'''
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image = pygame.image.load("simon/stand.png")
 
+        self.image = pygame.image.load("simon/stand.png")
         self.rect = Rect(xpos, ypos, self.image.get_width(),
                          self.image.get_height())
 
@@ -160,13 +160,26 @@ class Simon(Actor):
         self.sjmod = 1
         self.tip = 0
 
+        self.spritesheet = {}
+        os.chdir("simon")
+        for files in os.listdir("."):
+            if files.endswith(".png"):
+                self.spritesheet[files] = pygame.image.load(files)
+        os.chdir("..")
+
+        for images in self.spritesheet:
+            print images
+            print self.spritesheet[images]
+
     def update(self, inputs, world):
         '''update the state of Simon based on inputs and previous state'''
         self.inputs = inputs
         self.movx = 0
         self.movy = 0
+        self.image = self.spritesheet["stand.png"]
 
         if self.is_jumping:
+            self.image = self.spritesheet["jump.png"]
             if self.rect.y < self.tip:
                 self.velocity = 0
 
@@ -220,7 +233,6 @@ class Simon(Actor):
                 self.movy += self.rect.height/10
                 self.velocity = 0
                 self.is_falling = True
-        #print self.movy
         self.rect.y += self.movy
 
         newx = self.rect.x + self.movx
