@@ -106,6 +106,11 @@ def main():
 
         pygame.display.flip()
         fpsclock.tick(FPS)
+
+        if world.frame < 60:
+            world.frame  += 1
+        else:
+            world.frame = 0
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
 
 
@@ -118,6 +123,7 @@ class World(object):
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.simon)
         self.gravity = 3
+        self.frame = 0
 
     def mask_generate(self):
         '''Returns a list of rectangle objects based on image mask'''
@@ -152,13 +158,15 @@ class Simon(Actor):
         self.left_jump = False
         self.right_jump = False
         self.inputs = []
+        self.is_standing = True
 
         self.move = 2
         self.gravity = 3
-        self.jump_height = 60
+        self.jump_height = 65
         self.velocity = 0
         self.sjmod = 1
         self.tip = 0
+        self.count = 0
 
         self.spritesheet = {}
         os.chdir("simon")
@@ -179,7 +187,6 @@ class Simon(Actor):
         self.image = self.spritesheet["stand.png"]
 
         if self.is_jumping:
-            self.image = self.spritesheet["jump.png"]
             if self.rect.y < self.tip:
                 self.velocity = 0
 
@@ -188,7 +195,7 @@ class Simon(Actor):
         else:
             if self.inputs["a"]:
                 self.is_jumping = True
-                self.velocity = self.jump_height *.07
+                self.velocity = self.jump_height *.075
                 self.tip = self.rect.y - self.jump_height
 
                 if self.inputs["left"]:
@@ -197,6 +204,10 @@ class Simon(Actor):
                     self.right_jump = True
 
             else:
+                if self.count == 0:
+                    self.count += 1
+                else:
+                    self.count -= 1
                 if self.inputs["left"]:
                     self.movx -= self.move
                 elif self.inputs["right"]:
@@ -236,10 +247,41 @@ class Simon(Actor):
         self.rect.y += self.movy
 
         newx = self.rect.x + self.movx
+    
         for box in world.obstacles:
             if box.colliderect(newx, self.rect.y-world.gravity, self.rect.width, self.rect.height):
                 newx = self.rect.x
         self.rect.x = newx
+
+        if self.is_jumping is False:
+            if self.movx is 0:
+                self.is_standing = True
+            else:
+                self.is_standing = False
+        else:
+            self.image = self.spritesheet["jump.png"]
+
+        if self.is_standing is False and self.is_jumping is False:
+            if self.movx is not 0:
+                if world.frame < FPS/2 :
+                    self.image = self.spritesheet["walk1.png"]
+                else:
+                    self.image = self.spritesheet["walk2.png"]
+
+        if self.movx < 0:
+            self.direction = "Left"
+        elif self.movx > 0:
+            self.direction = "Right"
+        else:
+            pass
+
+        #print "I am standing:", self.is_standing
+        
+        if self.direction is "Right":
+            self.image = pygame.transform.flip(self.image, True, False)
+
+        
+
 
 if __name__ == "__main__":
     main()
