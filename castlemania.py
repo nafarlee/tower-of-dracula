@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''Castlevania Tower Defense Game'''
 __author__ = 'farley'
 import pygame, sys, os
@@ -107,7 +108,7 @@ def main():
         pygame.display.flip()
         fpsclock.tick(FPS)
 
-        if world.frame < 60:
+        if world.frame < FPS:
             world.frame  += 1
         else:
             world.frame = 0
@@ -263,7 +264,8 @@ class Simon(Actor):
 
         if self.is_standing is False and self.is_jumping is False:
             if self.movx is not 0:
-                if world.frame < FPS/2 :
+                frame = world.frame / 15
+                if frame is 1 or frame is 3:
                     self.image = self.spritesheet["walk1.png"]
                 else:
                     self.image = self.spritesheet["walk2.png"]
