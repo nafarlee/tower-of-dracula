@@ -265,7 +265,7 @@ class Simon(Actor):
         if self.is_standing is False and self.is_jumping is False:
             if self.movx is not 0:
                 frame = world.frame / 15
-                if frame is 1 or frame is 3:
+                if frame % 2 is not 0:
                     self.image = self.spritesheet["walk1.png"]
                 else:
                     self.image = self.spritesheet["walk2.png"]
