@@ -160,6 +160,7 @@ class Simon(Actor):
         self.right_jump = False
         self.inputs = []
         self.is_standing = True
+        self.attack_frame = -1
 
         self.move = 2
         self.gravity = 3
@@ -187,7 +188,11 @@ class Simon(Actor):
         self.movy = 0
         self.image = self.spritesheet["stand.png"]
 
+        #Main input processing
         if self.is_jumping:
+            if self.inputs["b"]:
+                self.is_attacking = True
+                self.attack_frame = 0
             if self.rect.y < self.tip:
                 self.velocity = 0
 
@@ -205,14 +210,12 @@ class Simon(Actor):
                     self.right_jump = True
 
             else:
-                if self.count == 0:
-                    self.count += 1
-                else:
-                    self.count -= 1
                 if self.inputs["left"]:
                     self.movx -= self.move
                 elif self.inputs["right"]:
                     self.movx += self.move
+
+        #Main character processing
         if self.inputs["up"]:
             self.movy -= self.gravity*3
         
@@ -265,10 +268,8 @@ class Simon(Actor):
         if self.is_standing is False and self.is_jumping is False:
             if self.movx is not 0:
                 
-                frame = world.frame / 15
-                if frame is 1 or frame is 3:
-                    self.image = self.spritesheet["stand.png"]
-                elif frame is 0:
+                f = world.frame / 15
+                if f is 1 or f is 3:
                     self.image = self.spritesheet["walk1.png"]
                 else:
                     self.image = self.spritesheet["walk2.png"]
