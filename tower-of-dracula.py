@@ -190,30 +190,36 @@ class Simon(Actor):
 
         #Main input processing
         if self.is_jumping:
-            if self.inputs["b"]:
+            if self.inputs["b"] and self.is_attacking is False:
                 self.is_attacking = True
-                self.attack_frame = 0
+                self.attack_frame = 1
             if self.rect.y < self.tip:
                 self.velocity = 0
 
         elif self.is_falling:
             pass
         else:
-            if self.inputs["a"]:
-                self.is_jumping = True
-                self.velocity = self.jump_height *.075
-                self.tip = self.rect.y - self.jump_height
-
-                if self.inputs["left"]:
-                    self.left_jump = True
-                elif self.inputs["right"]:
-                    self.right_jump = True
-
+            if self.is_attacking:
+                pass
             else:
-                if self.inputs["left"]:
-                    self.movx -= self.move
-                elif self.inputs["right"]:
-                    self.movx += self.move
+                if self.inputs["a"]:
+                    self.is_jumping = True
+                    self.velocity = self.jump_height *.075
+                    self.tip = self.rect.y - self.jump_height
+
+                    if self.inputs["left"]:
+                        self.left_jump = True
+                    elif self.inputs["right"]:
+                        self.right_jump = True
+
+                if self.inputs["b"]:
+                    self.is_attacking = True
+                    self.attack_frame = 1
+                else:
+                    if self.inputs["left"]:
+                        self.movx -= self.move
+                    elif self.inputs["right"]:
+                        self.movx += self.move
 
         #Main character processing
         if self.inputs["up"]:
@@ -274,6 +280,20 @@ class Simon(Actor):
                 else:
                     self.image = self.spritesheet["walk2.png"]
 
+        if self.is_attacking:
+            f = self.attack_frame / 15 + 1
+            print self.attack_frame
+            if self.is_jumping:
+                self.image = self.spritesheet["jumpattack" + str(f) + ".png"]
+            else:
+                self.image = self.spritesheet["attack" + str(f) + ".png"]
+            if self.attack_frame < 44:
+                self.attack_frame += 1
+            else:
+                self.attack_frame = -1
+                self.is_attacking = False
+
+
         if self.movx < 0:
             self.direction = "Left"
         elif self.movx > 0:
@@ -281,8 +301,6 @@ class Simon(Actor):
         else:
             pass
 
-        #print "I am standing:", self.is_standing
-        
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
 
