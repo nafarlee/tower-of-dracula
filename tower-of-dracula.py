@@ -27,7 +27,7 @@ def main():
     fpsclock = pygame.time.Clock()
     camerax = 735
     cameray = 453
-    playerx = 1400
+    playerx = 1388
     playery = 950
     masker = False
     back = pygame.image.load("level/background.png").convert_alpha()
@@ -94,16 +94,22 @@ def main():
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
+
         if masker:
+            if world.simon.is_attacking:
+                box = world.simon.attack
+                pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
+                                 box.y-camera.y, box.width, box.height))
+                pass
             for box in world.obstacles:
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
+
         for sprite in world.all_sprites:
             if camera.colliderect(sprite.rect):
-                screen.blit(sprite.image, (sprite.rect.x-camera.x,
+                screen.blit(sprite.image, (sprite.rect.x-camera.x-sprite.hitboxoffset,
                             sprite.rect.y-camera.y))
-
 
         pygame.display.flip()
         fpsclock.tick(FPS)
@@ -139,6 +145,7 @@ class Actor(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.movy = 0
         self.movx = 0
+        self.hitboxoffset = 0
         self.xpos = xpos
         self.ypos = ypos
         self.image = None
@@ -149,8 +156,9 @@ class Simon(Actor):
         Actor.__init__(self, xpos, ypos)
 
         self.image = pygame.image.load("simon/stand.png")
-        self.rect = Rect(xpos, ypos, self.image.get_width(),
-                         self.image.get_height())
+        self.hitboxoffset = 56
+        self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
+
 
         self.is_jumping = False
         self.direction = "Left"
@@ -161,6 +169,10 @@ class Simon(Actor):
         self.inputs = []
         self.is_standing = True
         self.attack_frame = -1
+
+        self.attack = Rect(0,0,0,0)
+
+        self.attack_size = (50, 15)
 
         self.move = 2
         self.gravity = 3
@@ -174,7 +186,7 @@ class Simon(Actor):
         os.chdir("simon")
         for files in os.listdir("."):
             if files.endswith(".png"):
-                self.spritesheet[files] = pygame.image.load(files)
+                self.spritesheet[files] = pygame.image.load(files).convert_alpha()
         os.chdir("..")
 
         for images in self.spritesheet:
@@ -287,11 +299,18 @@ class Simon(Actor):
                 self.image = self.spritesheet["jumpattack" + str(f) + ".png"]
             else:
                 self.image = self.spritesheet["attack" + str(f) + ".png"]
+            if f is 3:
+                if self.direction is "Left":
+                    self.attack = Rect((self.rect.x - 60, self.rect.y + 20), (self.attack_size))
+                else:
+                    self.attack = Rect((self.rect.x + self.rect.width + 10, self.rect.y + 20), (self.attack_size))
             if self.attack_frame < 44:
                 self.attack_frame += 1
             else:
                 self.attack_frame = -1
                 self.is_attacking = False
+                self.attack = Rect(0,0,0,0)
+
 
 
         if self.movx < 0:
@@ -303,6 +322,8 @@ class Simon(Actor):
 
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
+        
+        print self.rect.center
 
         
 
