@@ -191,9 +191,6 @@ class Simon(Actor):
                 self.spritesheet[files] = pygame.image.load(files).convert_alpha()
         os.chdir("..")
 
-        for images in self.spritesheet:
-            print images
-            print self.spritesheet[images]
 
     def update(self, inputs, world):
         '''update the state of Simon based on inputs and previous state'''
@@ -296,8 +293,7 @@ class Simon(Actor):
                     self.image = self.spritesheet["walk2.png"]
 
         if self.is_attacking:
-            f = self.attack_frame / 15 + 1
-            print self.attack_frame
+            f = self.attack_frame / 10 + 1
             if self.is_jumping:
                 self.image = self.spritesheet["jumpattack" + str(f) + ".png"]
             else:
@@ -307,7 +303,7 @@ class Simon(Actor):
                     self.attack = Rect((self.rect.x - 60, self.rect.y + 20), (self.attack_size))
                 else:
                     self.attack = Rect((self.rect.x + self.rect.width + 10, self.rect.y + 20), (self.attack_size))
-            if self.attack_frame < 44:
+            if self.attack_frame < 29:
                 self.attack_frame += 1
             else:
                 self.attack_frame = -1
@@ -325,7 +321,6 @@ class Simon(Actor):
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
         
-        print self.rect.center
 
         
 
