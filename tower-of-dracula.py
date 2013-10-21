@@ -4,9 +4,11 @@ __author__ = 'farley'
 import pygame, sys, os
 from pygame.locals import *
 
+
+
 FPS = 60
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
+WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
 BG_COLOR = pygame.Color('#271b8f')
 
 def main():
