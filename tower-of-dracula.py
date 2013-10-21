@@ -209,6 +209,7 @@ class Simon(Actor):
                 self.velocity = 0
 
         elif self.is_falling:
+            self.image = self.spritesheet["jump.png"]
             pass
         else:
             if self.is_attacking:
@@ -310,7 +311,6 @@ class Simon(Actor):
                 self.attack_frame = -1
                 self.is_attacking = False
                 self.attack = Rect(0,0,0,0)
-
 
 
         if self.movx < 0:
