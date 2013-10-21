@@ -53,6 +53,9 @@ def main():
                     camerax -= move
                 if event.key == K_RIGHT:
                     camerax += move
+                if event.key == K_c:
+                    camerax = world.simon.rect.x - WINDOW_WIDTH /2
+                    cameray = world.simon.rect.y - WINDOW_HEIGHT /2
 
                 if event.key == K_m:
                     masker = True
@@ -327,4 +330,3 @@ class Simon(Actor):
 
 if __name__ == "__main__":
     main()
-
