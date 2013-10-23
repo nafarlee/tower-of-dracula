@@ -96,6 +96,12 @@ def main():
         world.simon.update(inputs, world)
 
 
+        '''
+        if world.frame is 60:
+            camerax = world.simon.rect.x - WINDOW_WIDTH /2
+            cameray = world.simon.rect.y - WINDOW_HEIGHT /2
+        '''
+
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
