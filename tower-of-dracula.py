@@ -234,17 +234,32 @@ class Simon(Actor):
         elif self.is_climbing:
             if self.inputs["up"]:
                 if world.top_stairs[self.climb_index][0] < self.rect.x:
-                    self.rect.x -= 10
-                    self.rect.y -= 5
+                    self.rect.x -= 1
+                    self.rect.y -= 1
                     self.direction = "Left"
-                    if self.rect.y < world.top_stairs[self.climb_index][0]:
+                else:
+                    self.rect.x += 1
+                    self.rect.y -= 1
+                    self.direction = "Right"
+                    if self.rect.y < world.top_stairs[self.climb_index][1]:
                         self.is_climbing = False
                         print "disengage"
-
-                else:
-                    pass
             elif self.inputs["down"]:
-                pass
+                if world.bot_stairs[self.climb_index][0] < self.rect.x:
+                    self.rect.x -= 1
+                    self.rect.y += 1
+                    self.direction = "Left"
+                else:
+                    self.rect.x += 1
+                    self.rect.y += 1
+                    self.direction = "Right"
+                    if self.rect.y > world.bot_stairs[self.climb_index][1]:
+                        self.is_climbing = False
+                        print "disengage"
+            elif self.inputs["b"] and self.is_attacking is False:
+                self.is_attacking = True
+                self.attack_frame = 1
+
 
         elif self.is_falling:
             self.image = self.spritesheet["jump.png"]
@@ -294,46 +309,47 @@ class Simon(Actor):
 
 
         #Main character processing
-        foot = self.rect.y + self.rect.height + 4
-        for box in world.obstacles:
-            if box.collidepoint(self.rect.x, foot) == False:
-                self.is_falling = True
-
-        if self.left_jump:
-            self.movx -= self.move * self.sjmod
-        elif self.right_jump:
-            self.movx += self.move * self.sjmod
-
-        self.movy -= self.velocity
-        self.movy += world.gravity
-
-        
-        for box in (world.obstacles):
-            if self.rect.colliderect(box):
-                self.rect.y = box.y - self.rect.height
-                self.velocity = 0
-                self.is_falling = False
-                self.is_jumping = False
-                self.left_jump = False
-                self.right_jump = False
-
-        if self.is_climbing is False: 
+        if self.is_climbing is False:
+            foot = self.rect.y + self.rect.height + 4
             for box in world.obstacles:
-                if box.colliderect(self.rect.x, self.rect.y+self.movy, 
-                                self.rect.width, self.rect.height/10):
-                    self.movy += self.rect.height/10
-                    self.velocity = 0
+                if box.collidepoint(self.rect.x, foot) == False:
                     self.is_falling = True
 
-        self.rect.y += self.movy
+            if self.left_jump:
+                self.movx -= self.move * self.sjmod
+            elif self.right_jump:
+                self.movx += self.move * self.sjmod
 
-        newx = self.rect.x + self.movx
-    
-        for box in world.obstacles:
-            if box.colliderect(newx, self.rect.y-world.gravity, self.rect.width, self.rect.height):
-                newx = self.rect.x
-        self.rect.x = newx
+            self.movy -= self.velocity
+            self.movy += world.gravity
 
+            
+            for box in (world.obstacles):
+                if self.rect.colliderect(box):
+                    self.rect.y = box.y - self.rect.height
+                    self.velocity = 0
+                    self.is_falling = False
+                    self.is_jumping = False
+                    self.left_jump = False
+                    self.right_jump = False
+
+                for box in world.obstacles:
+                    if box.colliderect(self.rect.x, self.rect.y+self.movy, 
+                                    self.rect.width, self.rect.height/10):
+                        self.movy += self.rect.height/10
+                        self.velocity = 0
+                        self.is_falling = True
+
+            self.rect.y += self.movy
+
+            newx = self.rect.x + self.movx
+        
+            for box in world.obstacles:
+                if box.colliderect(newx, self.rect.y-world.gravity, self.rect.width, self.rect.height):
+                    newx = self.rect.x
+            self.rect.x = newx
+
+#Sprite processing
         if self.is_jumping is False:
             if self.movx is 0:
                 self.is_standing = True
@@ -351,10 +367,19 @@ class Simon(Actor):
                 else:
                     self.image = self.spritesheet["walk2.png"]
 
+        if self.is_climbing:
+            f = world.frame / 15
+            if f is 1 or f is 3:
+                self.image = self.spritesheet["stairs1.png"]
+            else:
+                self.image = self.spritesheet["stairs2.png"]
+
         if self.is_attacking:
             f = self.attack_frame / 10 + 1
             if self.is_jumping:
                 self.image = self.spritesheet["jumpattack" + str(f) + ".png"]
+            elif self.is_climbing:
+                self.image = self.spritesheet["stairsattack" + str(f) +".png"]
             else:
                 self.image = self.spritesheet["attack" + str(f) + ".png"]
             if f is 3:
@@ -379,6 +404,8 @@ class Simon(Actor):
 
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
+            
+        print self.is_attacking
         
 
         
