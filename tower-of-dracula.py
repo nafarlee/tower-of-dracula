@@ -114,10 +114,19 @@ def main():
                 box = world.simon.attack
                 pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
                                  box.y-camera.y, box.width, box.height))
-                pass
             for box in world.obstacles:
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
+                                     box.y-camera.y, box.width, box.height))
+            for steps in world.top_stairs:
+                box = Rect((steps[0] - world.stair_width/2, steps[1]), (world.stair_width, world.stair_height))
+                if box.colliderect(camera):
+                    pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
+                                     box.y-camera.y, box.width, box.height))
+            for steps in world.bot_stairs:
+                box = Rect((steps[0] - world.stair_width/2, steps[1]), (world.stair_width, world.stair_height))
+                if box.colliderect(camera):
+                    pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
 
         for sprite in world.all_sprites:
@@ -147,12 +156,22 @@ class World(object):
         self.frame = 0
 
         self.stair_width = 100
-        self.stair_height = 5
+        self.stair_height = 40
         self.bot_stairs = [
                 (320, 808),
+                (94, 582),
+                (752, 584),
+                (1275,582),
+                (2660, 520),
+                (2799, 390),
         ]
         self.top_stairs = [
                 (94, 582),
+                (235, 440),
+                (814,520),
+                (1137, 454),
+                (2807, 380),
+                (2567, 164),
         ]
 
 
@@ -243,7 +262,6 @@ class Simon(Actor):
                     self.direction = "Right"
                     if self.rect.y < world.top_stairs[self.climb_index][1]:
                         self.is_climbing = False
-                        print "disengage"
             elif self.inputs["down"]:
                 if world.bot_stairs[self.climb_index][0] < self.rect.x:
                     self.rect.x -= 1
@@ -255,7 +273,6 @@ class Simon(Actor):
                     self.direction = "Right"
                     if self.rect.y > world.bot_stairs[self.climb_index][1]:
                         self.is_climbing = False
-                        print "disengage"
             elif self.inputs["b"] and self.is_attacking is False:
                 self.is_attacking = True
                 self.attack_frame = 1
@@ -405,8 +422,8 @@ class Simon(Actor):
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
             
-        print self.is_attacking
         
+        print self.rect.x, self.rect.y
 
         
 
