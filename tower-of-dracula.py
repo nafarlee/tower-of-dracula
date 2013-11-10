@@ -7,8 +7,10 @@ from pygame.locals import *
 
 
 FPS = 60
-WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
-WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
+#WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
+#WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
+WINDOW_WIDTH = 1400
+WINDOW_HEIGHT = 900
 BG_COLOR = pygame.Color('#271b8f')
 
 def main():
@@ -21,10 +23,11 @@ def main():
 
     inputs = {
             "up":       False, 
+            "down":     False,
             "left":     False, 
             "right":    False, 
             "a":        False, 
-            "b":        False, 
+            "b":        False
     }
     fpsclock = pygame.time.Clock()
     camerax = 735
@@ -143,6 +146,16 @@ class World(object):
         self.gravity = 3
         self.frame = 0
 
+        self.stair_width = 100
+        self.stair_height = 5
+        self.bot_stairs = [
+                (320, 808),
+        ]
+        self.top_stairs = [
+                (94, 582),
+        ]
+
+
     def mask_generate(self):
         '''Returns a list of rectangle objects based on image mask'''
         background_mask = pygame.image.load("level/backgroundmask.png").convert_alpha()
@@ -172,6 +185,7 @@ class Simon(Actor):
 
 
         self.is_jumping = False
+        self.is_climbing = False
         self.direction = "Left"
         self.is_falling = False
         self.is_attacking = False
@@ -192,6 +206,8 @@ class Simon(Actor):
         self.sjmod = 1
         self.tip = 0
         self.count = 0
+
+        self.climb_index = -1
 
         self.spritesheet = {}
         os.chdir("simon")
@@ -215,6 +231,20 @@ class Simon(Actor):
                 self.attack_frame = 1
             if self.rect.y < self.tip:
                 self.velocity = 0
+        elif self.is_climbing:
+            if self.inputs["up"]:
+                if world.top_stairs[self.climb_index][0] < self.rect.x:
+                    self.rect.x -= 10
+                    self.rect.y -= 5
+                    self.direction = "Left"
+                    if self.rect.y < world.top_stairs[self.climb_index][0]:
+                        self.is_climbing = False
+                        print "disengage"
+
+                else:
+                    pass
+            elif self.inputs["down"]:
+                pass
 
         elif self.is_falling:
             self.image = self.spritesheet["jump.png"]
@@ -241,11 +271,29 @@ class Simon(Actor):
                         self.movx -= self.move
                     elif self.inputs["right"]:
                         self.movx += self.move
+                    elif self.inputs["up"]:
+                        for i, step in enumerate(world.bot_stairs):
+                            hook = Rect( (step[0] - world.stair_width/2, step[1]), (world.stair_width, world.stair_height))
+                            player = Rect(self.rect.x, self.rect.y,
+                                          self.rect.width, self.rect.height)
+
+                            if hook.colliderect(player):
+                                self.is_climbing = True
+                                self.climb_index = i
+                                self.rect.x = step[0]
+                    elif self.inputs["down"]:
+                        for i, step in enumerate(world.top_stairs):
+                            hook = Rect( (step[0] - world.stair_width/2, step[1]), (world.stair_width, world.stair_height))
+                            player = Rect(self.rect.x, self.rect.y,
+                                          self.rect.width, self.rect.height)
+
+                            if hook.colliderect(player):
+                                self.is_climbing = True
+                                self.climb_index = i
+                                self.rect.x = step[0]
+
 
         #Main character processing
-        if self.inputs["up"]:
-            self.movy -= self.gravity*3
-        
         foot = self.rect.y + self.rect.height + 4
         for box in world.obstacles:
             if box.collidepoint(self.rect.x, foot) == False:
@@ -268,13 +316,15 @@ class Simon(Actor):
                 self.is_jumping = False
                 self.left_jump = False
                 self.right_jump = False
-        
-        for box in world.obstacles:
-            if box.colliderect(self.rect.x, self.rect.y+self.movy, 
-                               self.rect.width, self.rect.height/10):
-                self.movy += self.rect.height/10
-                self.velocity = 0
-                self.is_falling = True
+
+        if self.is_climbing is False: 
+            for box in world.obstacles:
+                if box.colliderect(self.rect.x, self.rect.y+self.movy, 
+                                self.rect.width, self.rect.height/10):
+                    self.movy += self.rect.height/10
+                    self.velocity = 0
+                    self.is_falling = True
+
         self.rect.y += self.movy
 
         newx = self.rect.x + self.movx
