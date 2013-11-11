@@ -111,9 +111,6 @@ def main():
         topy = cameray + WINDOW_HEIGHT / 4
         bottomy = cameray + WINDOW_HEIGHT - (WINDOW_HEIGHT/4)
 
-        print "The top is ", topy, "The bottom is", bottomy
-        print world.simon.rect.y
-
         if world.simon.rect.y < topy:
             cameray -= 1
         elif world.simon.rect.y > bottomy:
