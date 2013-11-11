@@ -100,10 +100,17 @@ def main():
         world.simon.update(inputs, world)
 
 
-        '''
-        if :
-            camerax = world.simon.rect.x - WINDOW_WIDTH /2
-        '''
+        leftx = camerax + WINDOW_WIDTH / 4
+        rightx = camerax + WINDOW_WIDTH - (WINDOW_WIDTH/4)
+
+        print "The left is ", leftx, "The right is", rightx
+        print world.simon.rect.x
+
+        if world.simon.rect.x < leftx:
+            camerax -= world.simon.move
+        elif world.simon.rect.x > rightx:
+            camerax += world.simon.move
+
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
