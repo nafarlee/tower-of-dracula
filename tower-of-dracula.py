@@ -103,13 +103,21 @@ def main():
         leftx = camerax + WINDOW_WIDTH / 4
         rightx = camerax + WINDOW_WIDTH - (WINDOW_WIDTH/4)
 
-        print "The left is ", leftx, "The right is", rightx
-        print world.simon.rect.x
-
         if world.simon.rect.x < leftx:
             camerax -= world.simon.move
         elif world.simon.rect.x > rightx:
             camerax += world.simon.move
+
+        topy = cameray + WINDOW_HEIGHT / 4
+        bottomy = cameray + WINDOW_HEIGHT - (WINDOW_HEIGHT/4)
+
+        print "The top is ", topy, "The bottom is", bottomy
+        print world.simon.rect.y
+
+        if world.simon.rect.y < topy:
+            cameray -= 1
+        elif world.simon.rect.y > bottomy:
+            cameray += 2
 
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
