@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 '''Castlevania Tower Defense Game'''
+
 __author__ = 'farley'
+
 import pygame, sys, os
 from pygame.locals import *
 
-
-
 FPS = 60
-#WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
-#WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
-WINDOW_WIDTH = 1400
-WINDOW_HEIGHT = 900
+WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
+WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
+#WINDOW_WIDTH = 1400
+#WINDOW_HEIGHT = 900
 BG_COLOR = pygame.Color('#271b8f')
 
 def main():
     '''Run the game with default settings'''
+
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -100,11 +101,9 @@ def main():
 
 
         '''
-        if world.frame is 60:
+        if :
             camerax = world.simon.rect.x - WINDOW_WIDTH /2
-            cameray = world.simon.rect.y - WINDOW_HEIGHT /2
         '''
-
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
@@ -148,7 +147,7 @@ class World(object):
     '''Class that represents the state of the game world'''
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
-        self.obstacles = self.mask_generate()
+        self.obstacles = self.generate_obstacles()
         self.background = pygame.image.load("level/background.png").convert_alpha()
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.simon)
@@ -175,7 +174,7 @@ class World(object):
         ]
 
 
-    def mask_generate(self):
+    def generate_obstacles(self):
         '''Returns a list of rectangle objects based on image mask'''
         background_mask = pygame.image.load("level/backgroundmask.png").convert_alpha()
         level_mask = pygame.mask.from_surface(background_mask)
@@ -243,7 +242,7 @@ class Simon(Actor):
         self.movy = 0
         self.image = self.spritesheet["stand.png"]
 
-        #Main input processing
+        #Check valid input based on state
         if self.is_jumping:
             if self.inputs["b"] and self.is_attacking is False:
                 self.is_attacking = True
@@ -277,7 +276,7 @@ class Simon(Actor):
                 self.is_attacking = True
                 self.attack_frame = 1
 
-
+        #Disallow movement if falling
         elif self.is_falling:
             self.image = self.spritesheet["jump.png"]
             pass
@@ -303,6 +302,7 @@ class Simon(Actor):
                         self.movx -= self.move
                     elif self.inputs["right"]:
                         self.movx += self.move
+                    #Stair Mounting
                     elif self.inputs["up"]:
                         for i, step in enumerate(world.bot_stairs):
                             hook = Rect( (step[0] - world.stair_width/2, step[1]), (world.stair_width, world.stair_height))
@@ -325,7 +325,7 @@ class Simon(Actor):
                                 self.rect.x = step[0]
 
 
-        #Main character processing
+        #Character action definitions
         if self.is_climbing is False:
             foot = self.rect.y + self.rect.height + 4
             for box in world.obstacles:
@@ -341,6 +341,7 @@ class Simon(Actor):
             self.movy += world.gravity
 
             
+            #Gravity and collission handling
             for box in (world.obstacles):
                 if self.rect.colliderect(box):
                     self.rect.y = box.y - self.rect.height
@@ -423,10 +424,6 @@ class Simon(Actor):
             self.image = pygame.transform.flip(self.image, True, False)
             
         
-        print self.rect.x, self.rect.y
-
-        
-
 
 if __name__ == "__main__":
     main()
