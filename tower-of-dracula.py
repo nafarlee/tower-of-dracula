@@ -206,6 +206,8 @@ class Actor(pygame.sprite.Sprite):
         self.image = None
         self.rect = None
         self.direction = "Left"
+        self.maxhealth = 1
+        self.health = self.maxhealth
         return
 
 class Zombie(Actor):
@@ -216,6 +218,20 @@ class Zombie(Actor):
 
     def update(self, world):
         '''Enemy AI processing'''
+        if world.simon.rect.x < self.rect.x:
+            self.movx -= self.move
+        else:
+            self.movx += self.move
+        if world.simon.rect.y < self.rect.y:
+            self.movy -= self.move
+        else: 
+            self.movy += self.move
+
+        self.rect.x += self.movx
+        self.rect.y += self.movy
+
+    def recieve_hit(self):
+        '''actions to take when hit by player1's attack'''
         pass
         
 
@@ -227,6 +243,8 @@ class Simon(Actor):
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
+        self.maxhealth = 1
+        self.health = self.maxhealth
 
 
         self.is_jumping = False
