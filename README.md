@@ -22,7 +22,7 @@ Controls:
 - _Space + A_ - Jump Left
 - _Space + D_ - Jump Right
 
-Debug ControlS:
+Debug Controls:
 ===============
 
 - _C_ - Center Camera on Player 1
