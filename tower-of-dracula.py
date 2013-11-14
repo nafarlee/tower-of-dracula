@@ -200,8 +200,6 @@ class Actor(pygame.sprite.Sprite):
         self.movy = 0
         self.movx = 0
         self.hitboxoffset = 0
-        self.xpos = xpos
-        self.ypos = ypos
         self.image = None
 
 class Simon(Actor):
