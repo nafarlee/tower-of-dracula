@@ -3,7 +3,8 @@
 
 __author__ = 'farley'
 
-import pygame, sys, os
+import sys, os
+import pygame
 from pygame.locals import *
 
 FPS = 60
@@ -195,12 +196,28 @@ class World(object):
 
 class Actor(pygame.sprite.Sprite):
     '''Base class for all entities in the game world'''
+
     def __init__(self, xpos, ypos):
         pygame.sprite.Sprite.__init__(self)
         self.movy = 0
         self.movx = 0
+        self.move = 1
         self.hitboxoffset = 0
         self.image = None
+        self.rect = None
+        self.direction = "Left"
+        return
+
+class Zombie(Actor):
+    '''Class that represents zombies in the game world'''
+    def __init__(self, xpos, ypos):
+        Actor.__init__(self, xpos, ypos)
+        self.image = pygame.image.load("simon/stand.png")
+
+    def update(self, world):
+        '''Enemy AI processing'''
+        pass
+        
 
 class Simon(Actor):
     '''Class that represents player 1 in the game world'''
@@ -214,26 +231,23 @@ class Simon(Actor):
 
         self.is_jumping = False
         self.is_climbing = False
-        self.direction = "Left"
         self.is_falling = False
         self.is_attacking = False
         self.left_jump = False
         self.right_jump = False
-        self.inputs = []
         self.is_standing = True
-        self.attack_frame = -1
+
+        self.inputs = []
 
         self.attack = Rect(0,0,0,0)
-
+        self.attack_frame = -1
         self.attack_size = (50, 15)
 
         self.move = 2
-        self.gravity = 3
         self.jump_height = 65
         self.velocity = 0
         self.sjmod = 1
         self.tip = 0
-        self.count = 0
 
         self.climb_index = -1
 
