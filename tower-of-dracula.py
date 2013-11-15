@@ -8,10 +8,10 @@ import pygame
 from pygame.locals import *
 
 FPS = 60
-WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
-WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
-#WINDOW_WIDTH = 1400
-#WINDOW_HEIGHT = 900
+#WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
+#WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
+WINDOW_WIDTH = 1400
+WINDOW_HEIGHT = 900
 BG_COLOR = pygame.Color('#271b8f')
 
 def main():
@@ -102,7 +102,6 @@ def main():
 
         world.simon.update(inputs, world)
         for i, enemy in enumerate(world.enemies):
-            print i
             enemy.update(world)
             if world.simon.is_attacking:
                 box = world.simon.attack
@@ -306,7 +305,9 @@ class Simon(Actor):
             if self.rect.y < self.tip:
                 self.velocity = 0
         elif self.is_climbing:
-            if self.inputs["up"]:
+            if self.is_attacking:
+                pass
+            elif self.inputs["up"]:
                 if world.top_stairs[self.climb_index][0] < self.rect.x:
                     self.rect.x -= 1
                     self.rect.y -= 1
@@ -328,7 +329,7 @@ class Simon(Actor):
                     self.direction = "Right"
                     if self.rect.y > world.bot_stairs[self.climb_index][1]:
                         self.is_climbing = False
-            elif self.inputs["b"] and self.is_attacking is False:
+            if self.inputs["b"] and self.is_attacking is False:
                 self.is_attacking = True
                 self.attack_frame = 1
 
