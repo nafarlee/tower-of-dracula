@@ -139,19 +139,22 @@ def main():
                     pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
             for steps in world.top_stairs:
-                box = Rect((steps[0] - world.stair_width/2, steps[1]), (world.stair_width, world.stair_height))
+                box = Rect((steps[0] - world.stair_width/2, steps[1]), 
+                           (world.stair_width, world.stair_height))
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
             for steps in world.bot_stairs:
-                box = Rect((steps[0] - world.stair_width/2, steps[1]), (world.stair_width, world.stair_height))
+                box = Rect((steps[0] - world.stair_width/2, steps[1]), 
+                           (world.stair_width, world.stair_height))
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
 
         for sprite in world.all_sprites:
             if camera.colliderect(sprite.rect):
-                screen.blit(sprite.image, (sprite.rect.x-camera.x-sprite.hitboxoffset,
+                screen.blit(sprite.image,
+                           (sprite.rect.x-camera.x-sprite.hitboxoffset,
                             sprite.rect.y-camera.y))
 
         pygame.display.flip()
@@ -169,7 +172,8 @@ class World(object):
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
         self.obstacles = self.generate_obstacles()
-        self.background = pygame.image.load("level/background.png").convert_alpha()
+        self.background = (pygame.image.load
+                ("level/background.png").convert_alpha())
         self.enemies = []
         self.all_sprites = []
         self.all_sprites.append(self.simon)
@@ -213,7 +217,8 @@ class World(object):
 
     def generate_obstacles(self):
         '''Returns a list of rectangle objects based on image mask'''
-        background_mask = pygame.image.load("level/backgroundmask.png").convert_alpha()
+        background_mask = (pygame.image.load
+                ("level/backgroundmask.png").convert_alpha())
         level_mask = pygame.mask.from_surface(background_mask)
         level_collisions = level_mask.get_bounding_rects()
         return level_collisions
@@ -324,7 +329,8 @@ class Simon(Actor):
         os.chdir("simon")
         for files in os.listdir("."):
             if files.endswith(".png"):
-                self.spritesheet[files] = pygame.image.load(files).convert_alpha()
+                self.spritesheet[files] = (pygame.image.load
+                        (files).convert_alpha())
         os.chdir("..")
 
 
@@ -400,7 +406,9 @@ class Simon(Actor):
                     #Stair Mounting
                     elif self.inputs["up"]:
                         for i, step in enumerate(world.bot_stairs):
-                            hook = Rect( (step[0] - world.stair_width/2, step[1]), (world.stair_width, world.stair_height))
+                            hook = Rect( (step[0] - world.stair_width/2, 
+                                step[1]), (world.stair_width, 
+                                    world.stair_height))
                             player = Rect(self.rect.x, self.rect.y,
                                           self.rect.width, self.rect.height)
 
@@ -410,7 +418,9 @@ class Simon(Actor):
                                 self.rect.x = step[0]
                     elif self.inputs["down"]:
                         for i, step in enumerate(world.top_stairs):
-                            hook = Rect( (step[0] - world.stair_width/2, step[1]), (world.stair_width, world.stair_height))
+                            hook = Rect( (step[0] - world.stair_width/2, 
+                                step[1]), (world.stair_width, 
+                                    world.stair_height))
                             player = Rect(self.rect.x, self.rect.y,
                                           self.rect.width, self.rect.height)
 
@@ -458,7 +468,8 @@ class Simon(Actor):
             newx = self.rect.x + self.movx
         
             for box in world.obstacles:
-                if box.colliderect(newx, self.rect.y-world.gravity, self.rect.width, self.rect.height):
+                if box.colliderect(newx, self.rect.y-world.gravity, 
+                        self.rect.width, self.rect.height):
                     newx = self.rect.x
             self.rect.x = newx
 
@@ -497,9 +508,11 @@ class Simon(Actor):
                 self.image = self.spritesheet["attack" + str(f) + ".png"]
             if f is 3:
                 if self.direction is "Left":
-                    self.attack = Rect((self.rect.x - 60, self.rect.y + 20), (self.attack_size))
+                    self.attack = Rect((self.rect.x - 60, self.rect.y + 20), 
+                            (self.attack_size))
                 else:
-                    self.attack = Rect((self.rect.x + self.rect.width + 10, self.rect.y + 20), (self.attack_size))
+                    self.attack = Rect((self.rect.x + self.rect.width + 10, 
+                            self.rect.y + 20), (self.attack_size))
             if self.attack_frame < 29:
                 self.attack_frame += 1
             else:
@@ -520,3 +533,4 @@ class Simon(Actor):
 
 if __name__ == "__main__":
     main()
+
