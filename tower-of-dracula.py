@@ -9,10 +9,10 @@ from random import randrange
 from pygame.locals import *
 
 FPS = 60
-#WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
-#WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
-WINDOW_WIDTH = 1400
-WINDOW_HEIGHT = 900
+WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
+assert WINDOW_WIDTH > 640, "Window is gonna be too short"
+WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
+assert WINDOW_HEIGHT > 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
 
 def main():
