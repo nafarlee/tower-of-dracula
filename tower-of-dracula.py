@@ -203,8 +203,12 @@ class World(object):
             if self.simon.is_attacking:
                 box = self.simon.attack
                 if box.colliderect(enemy.rect):
-                    self.destroy_enemy(i)
-        pass
+                    self.destroy_actor(i)
+            box = self.simon.rect
+            if box.colliderect(enemy):
+                print "Simon was hit"
+                
+
            
 
     def generate_obstacles(self):
@@ -220,7 +224,7 @@ class World(object):
             self.enemies.append(Zombie(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
         
-    def destroy_enemy(self, index):
+    def destroy_actor(self, index):
         '''removes an enemy in the game world'''
         del self.enemies[index]
         del self.all_sprites[index+1]
