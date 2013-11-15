@@ -9,9 +9,9 @@ from random import randrange
 from pygame.locals import *
 
 FPS = 60
-WINDOW_WIDTH = int(raw_input("Enter Screen width: "))
+WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
 assert WINDOW_WIDTH > 640, "Window is gonna be too short"
-WINDOW_HEIGHT = int(raw_input("Enter Screen height: " ))
+WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
 assert WINDOW_HEIGHT > 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
 
@@ -49,7 +49,6 @@ def main():
 
             if event.type is MOUSEBUTTONUP:
                 mousex, mousey = event.pos
-                print mousex, mousey
                 xpos = mousex + camerax
                 ypos = mousey + cameray
                 world.create_enemy(xpos, ypos)
@@ -246,7 +245,8 @@ class Zombie(Actor):
     '''Class that represents zombies in the game world'''
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image = pygame.image.load("enemy/zombie1.png")
+        self.image1 = pygame.image.load("enemy/zombie1.png")
+        self.image = self.image1
         self.hitboxoffset = 0
 
         self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
@@ -255,6 +255,7 @@ class Zombie(Actor):
         '''Enemy AI processing'''
         self.movx = 0
         self.movy = 0
+        self.image = self.image1
         if world.simon.rect.x < self.rect.x:
             self.movx -= self.move
         elif world.simon.rect.x > self.rect.x:
@@ -263,6 +264,16 @@ class Zombie(Actor):
             self.movy -= self.move
         elif world.simon.rect.y > self.rect.y: 
             self.movy += self.move
+        
+        if self.movx < 0:
+            self.direction = "Left"
+        elif self.movx > 0:
+            self.direction = "Right"
+
+        if self.direction is "Right":
+            self.image = pygame.transform.flip(self.image, True, False)
+
+
         self.rect.x += self.movx
         self.rect.y += self.movy
 
@@ -497,8 +508,6 @@ class Simon(Actor):
             self.direction = "Left"
         elif self.movx > 0:
             self.direction = "Right"
-        else:
-            pass
 
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
