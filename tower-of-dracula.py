@@ -37,8 +37,6 @@ def main():
     playerx = 1388
     playery = 950
     masker = False
-    back = pygame.image.load("level/background.png").convert_alpha()
-    mask = pygame.image.load("level/backgroundmask.png").convert_alpha()
 
     world = World(playerx, playery)
 
@@ -83,6 +81,10 @@ def main():
                 if event.key == K_LSHIFT:
                     inputs["b"] = True
 
+                if event.key == K_p:
+                    world.enemies.append(Zombie(1000, 400))
+                    world.all_sprites.append(world.enemies[-1])
+
             if event.type == KEYUP:
                 if event.key == K_w:
                     inputs["up"] = False
@@ -99,6 +101,14 @@ def main():
 
 
         world.simon.update(inputs, world)
+        for i, enemy in enumerate(world.enemies):
+            print i
+            enemy.update(world)
+            if world.simon.is_attacking:
+                box = world.simon.attack
+                if box.colliderect(enemy.rect):
+                    del world.enemies[i]
+                    del world.all_sprites[i+1]
 
 
         leftx = camerax + WINDOW_WIDTH / 4
@@ -162,8 +172,9 @@ class World(object):
         self.simon = Simon(playerx, playery)
         self.obstacles = self.generate_obstacles()
         self.background = pygame.image.load("level/background.png").convert_alpha()
-        self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.simon)
+        self.enemies = []
+        self.all_sprites = []
+        self.all_sprites.append(self.simon)
         self.gravity = 3
         self.frame = 0
 
@@ -215,18 +226,21 @@ class Zombie(Actor):
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
         self.image = pygame.image.load("simon/stand.png")
+        self.hitboxoffset = 56
+        self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
 
     def update(self, world):
         '''Enemy AI processing'''
+        self.movx = 0
+        self.movy = 0
         if world.simon.rect.x < self.rect.x:
             self.movx -= self.move
-        else:
+        elif world.simon.rect.x > self.rect.x:
             self.movx += self.move
         if world.simon.rect.y < self.rect.y:
             self.movy -= self.move
-        else: 
+        elif world.simon.rect.y > self.rect.y: 
             self.movy += self.move
-
         self.rect.x += self.movx
         self.rect.y += self.movy
 
