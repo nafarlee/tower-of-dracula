@@ -47,6 +47,14 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+            if event.type is MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                print mousex, mousey
+                xpos = mousex + camerax
+                ypos = mousey + cameray
+                world.create_enemy(xpos, ypos)
+
+
             if event.type == KEYDOWN:
                 move = 30
                 if event.key == K_UP:
@@ -83,7 +91,7 @@ def main():
                     inputs["b"] = True
 
                 if event.key == K_p:
-                    world.create_enemy(1000, 400)
+                    world.create_enemy(randrange(1400), randrange(800))
 
             if event.type == KEYUP:
                 if event.key == K_w:
@@ -238,12 +246,10 @@ class Zombie(Actor):
     '''Class that represents zombies in the game world'''
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image = pygame.image.load("simon/stand.png")
-        self.hitboxoffset = 56
+        self.image = pygame.image.load("enemy/zombie1.png")
+        self.hitboxoffset = 0
 
-        xpos = randrange(1400)
-        ypos = randrange(800)
-        self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
+        self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
     def update(self, world):
         '''Enemy AI processing'''
