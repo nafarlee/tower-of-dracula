@@ -9,9 +9,8 @@ Tested on:
 - Python 2.7.5
 - Pygame 1.9.1
 
-Controls:
-=========
-
+Player 1 Controls:
+==================
 
 - _A_ - Walk Left
 - _D_ - Walk Right
@@ -21,6 +20,14 @@ Controls:
 - _Space_ - Jump Vertically
 - _Space + A_ - Jump Left
 - _Space + D_ - Jump Right
+
+
+Player 2 Controls:
+==================
+
+- _P_ - Spawn Zombie in random position on map
+- _Left Mouse Click_ - Spawn Zombie at position clicked
+
 
 Debug Controls:
 ===============
