@@ -100,14 +100,7 @@ def main():
                     inputs["b"] = False
 
 
-        world.simon.update(inputs, world)
-        for i, enemy in enumerate(world.enemies):
-            enemy.update(world)
-            if world.simon.is_attacking:
-                box = world.simon.attack
-                if box.colliderect(enemy.rect):
-                    world.destroy_enemy(i)
-
+        world.update(inputs)
 
         leftx = camerax + WINDOW_WIDTH / 4
         rightx = camerax + WINDOW_WIDTH - (WINDOW_WIDTH/4)
@@ -195,6 +188,17 @@ class World(object):
                 (2567, 164),
         ]
 
+    def update(self, inputs):
+        '''call all world processing routines'''
+        self.simon.update(inputs, self)
+        for i, enemy in enumerate(self.enemies):
+            enemy.update(self)
+            if self.simon.is_attacking:
+                box = self.simon.attack
+                if box.colliderect(enemy.rect):
+                    self.destroy_enemy(i)
+        pass
+           
 
     def generate_obstacles(self):
         '''Returns a list of rectangle objects based on image mask'''
@@ -204,13 +208,13 @@ class World(object):
         return level_collisions
 
     def create_enemy(self, xpos, ypos, type="Zombie"):
-        """create an enemy in the game world"""
+        '''create an enemy in the game world'''
         if type is "Zombie":
             self.enemies.append(Zombie(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
         
     def destroy_enemy(self, index):
-        """removes an enemy in the game world"""
+        '''removes an enemy in the game world'''
         del self.enemies[index]
         del self.all_sprites[index+1]
 
