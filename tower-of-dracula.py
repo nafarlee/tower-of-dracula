@@ -5,6 +5,7 @@ __author__ = 'farley'
 
 import sys, os
 import pygame
+from random import randrange
 from pygame.locals import *
 
 FPS = 60
@@ -82,8 +83,7 @@ def main():
                     inputs["b"] = True
 
                 if event.key == K_p:
-                    world.enemies.append(Zombie(1000, 400))
-                    world.all_sprites.append(world.enemies[-1])
+                    world.create_enemy(1000, 400)
 
             if event.type == KEYUP:
                 if event.key == K_w:
@@ -106,8 +106,7 @@ def main():
             if world.simon.is_attacking:
                 box = world.simon.attack
                 if box.colliderect(enemy.rect):
-                    del world.enemies[i]
-                    del world.all_sprites[i+1]
+                    world.destroy_enemy(i)
 
 
         leftx = camerax + WINDOW_WIDTH / 4
@@ -204,6 +203,17 @@ class World(object):
         level_collisions = level_mask.get_bounding_rects()
         return level_collisions
 
+    def create_enemy(self, xpos, ypos, type="Zombie"):
+        """create an enemy in the game world"""
+        if type is "Zombie":
+            self.enemies.append(Zombie(xpos, ypos))
+            self.all_sprites.append(self.enemies[-1])
+        
+    def destroy_enemy(self, index):
+        """removes an enemy in the game world"""
+        del self.enemies[index]
+        del self.all_sprites[index+1]
+
 class Actor(pygame.sprite.Sprite):
     '''Base class for all entities in the game world'''
 
@@ -226,6 +236,9 @@ class Zombie(Actor):
         Actor.__init__(self, xpos, ypos)
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
+
+        xpos = randrange(1400)
+        ypos = randrange(800)
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
 
     def update(self, world):
