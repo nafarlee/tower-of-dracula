@@ -318,10 +318,10 @@ class Simon(Actor):
         self.attack_size = (50, 15)
 
         self.move = 2
-        self.jump_height = 65
+        self.jump_velocity = 8.0
+        self.jump_decay = .25
         self.velocity = 0
         self.sjmod = 1
-        self.tip = 0
 
         self.climb_index = -1
 
@@ -346,8 +346,7 @@ class Simon(Actor):
             if self.inputs["b"] and self.is_attacking is False:
                 self.is_attacking = True
                 self.attack_frame = 1
-            if self.rect.y < self.tip:
-                self.velocity = 0
+            self.velocity -= self.jump_decay
         elif self.is_climbing:
             if self.is_attacking:
                 pass
@@ -387,8 +386,7 @@ class Simon(Actor):
             else:
                 if self.inputs["a"]:
                     self.is_jumping = True
-                    self.velocity = self.jump_height *.075
-                    self.tip = self.rect.y - self.jump_height
+                    self.velocity = self.jump_velocity
 
                     if self.inputs["left"]:
                         self.left_jump = True
