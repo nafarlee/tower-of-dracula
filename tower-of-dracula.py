@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#Perfect World Runtime - 80 seconds
 '''Castlevania Tower Defense Game'''
 
 __author__ = 'farley'
@@ -209,11 +210,10 @@ class World(object):
                 if box.colliderect(enemy.rect):
                     self.destroy_actor(i)
             box = self.simon.rect
-            if box.colliderect(enemy):
-                print "Simon was hit"
-                
-
-           
+            if (box.colliderect(enemy) 
+                    and self.simon.invul is False 
+                    and self.simon.is_climbing is False):
+                self.simon.big_toss()
 
     def generate_obstacles(self):
         '''Returns a list of rectangle objects based on image mask'''
@@ -310,6 +310,9 @@ class Simon(Actor):
         self.left_jump = False
         self.right_jump = False
         self.is_standing = True
+        self.is_big_toss = False
+        self.invul = False
+        self.invul_frame = -1
 
         self.inputs = []
 
@@ -333,6 +336,9 @@ class Simon(Actor):
                         (files).convert_alpha())
         os.chdir("..")
 
+    def big_toss(self):
+        print "big toss was called"
+        self.invul = True
 
     def update(self, inputs, world):
         '''update the state of Simon based on inputs and previous state'''
@@ -340,7 +346,7 @@ class Simon(Actor):
         self.movx = 0
         self.movy = 0
         self.image = self.spritesheet["stand.png"]
-
+        
         #Check valid input based on state
         if self.is_jumping:
             if self.inputs["b"] and self.is_attacking is False:
