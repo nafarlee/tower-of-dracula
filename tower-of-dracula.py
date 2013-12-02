@@ -11,9 +11,9 @@ from pygame.locals import *
 
 FPS = 60
 WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
-assert WINDOW_WIDTH > 640, "Window is gonna be too short"
+assert WINDOW_WIDTH >= 640, "Window is gonna be too short"
 WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
-assert WINDOW_HEIGHT > 480, "Window is gonna be too thin"
+assert WINDOW_HEIGHT >= 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
 
 def main():
@@ -24,6 +24,8 @@ def main():
     pygame.mixer.music.load("sounds/vamp.mp3")
     pygame.mixer.music.play(-1)
 
+    font = pygame.font.SysFont(None, 50)
+
     inputs = {
             "up":       False, 
             "down":     False,
@@ -33,8 +35,8 @@ def main():
             "b":        False
     }
     fpsclock = pygame.time.Clock()
-    camerax = 735
-    cameray = 453
+    camerax = 600
+    cameray = 300
     playerx = 1388
     playery = 950
     masker = False
@@ -156,6 +158,9 @@ def main():
                 screen.blit(sprite.image,
                            (sprite.rect.x-camera.x-sprite.hitboxoffset,
                             sprite.rect.y-camera.y))
+
+        label = font.render(str(world.simon.health), 1, (255,255,255))
+        screen.blit(label, (10, 10)) 
 
         pygame.display.flip()
         fpsclock.tick(FPS)
@@ -301,7 +306,7 @@ class Simon(Actor):
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
-        self.maxhealth = 1
+        self.maxhealth = 3
         self.health = self.maxhealth
 
 
@@ -339,9 +344,15 @@ class Simon(Actor):
                         (files).convert_alpha())
         os.chdir("..")
 
+    def die(self):
+        pygame.quit()
+        sys.exit()
+
     def recieve_hit(self, enemyrelpos):
         if not self.invul:
-            #self.health -= 1
+            self.health -= 1
+            if self.health is 0:
+                self.die()
             self.invul = True
             self.invul_frame = 0
 
