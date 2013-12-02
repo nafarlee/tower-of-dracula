@@ -558,6 +558,9 @@ class Simon(Actor):
                 self.attack_frame = -1
                 self.is_attacking = False
                 self.attack = Rect(0,0,0,0)
+        
+        if self.is_big_toss:
+            self.image = self.spritesheet["damage.png"]
 
 
         if self.movx < 0:
