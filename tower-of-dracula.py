@@ -43,6 +43,8 @@ def main():
     playery = 950
     masker = False
 
+    enemy_type = "Zombie"
+
     world = World(playerx, playery)
     
     #Game Loop
@@ -57,7 +59,7 @@ def main():
                 mousex, mousey = event.pos
                 xpos = mousex + camerax
                 ypos = mousey + cameray
-                world.create_enemy(xpos, ypos)
+                world.create_enemy(xpos, ypos, enemy_type)
 
 
             if event.type == KEYDOWN:
@@ -81,6 +83,11 @@ def main():
                 if event.key == K_o:
                     camerax = 700
                     cameray = 400
+
+                if event.key == K_1:
+                    enemy_type = "Zombie"
+                if event.key == K_2:
+                    enemy_type = "Bat"
 
                 if event.key == K_w:
                     inputs["up"] = True
@@ -137,6 +144,14 @@ def main():
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
 
+                    
+
+        for sprite in world.all_sprites:
+            if camera.colliderect(sprite.rect):
+                screen.blit(sprite.image,
+                           (sprite.rect.x-camera.x-sprite.hitboxoffset,
+                            sprite.rect.y-camera.y))
+
         if masker:
             if world.simon.is_attacking:
                 box = world.simon.attack
@@ -158,17 +173,21 @@ def main():
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
-
-        for sprite in world.all_sprites:
-            if camera.colliderect(sprite.rect):
-                screen.blit(sprite.image,
-                           (sprite.rect.x-camera.x-sprite.hitboxoffset,
-                            sprite.rect.y-camera.y))
+            for enemy in world.enemies:
+                box = enemy.rect
+                if box.colliderect(camera):
+                    pygame.draw.rect(screen, (0, 255, 255), (box.x-camera.x, 
+                                     box.y-camera.y, box.width, box.height))
 
         label = font.render(str(world.simon.health), 1, (255,255,255))
         screen.blit(label, (10, 10)) 
         label = font.render(str(world.time), 1, (255,255,255))
         screen.blit(label, (10, 60)) 
+
+        print enemy_type
+        label = font.render(enemy_type, 1, (255,255,255))
+        screen.blit(label, (10, 110)) 
+
         pygame.display.flip()
 
 
@@ -282,7 +301,7 @@ class Bat(Actor):
         self.image = self.image1
 
         self.hitboxoffset = 0
-        self.rect = Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 30)
+        self.rect = Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 50)
         self.swoop = 180
         self.swoop_frame = self.swoop
         self.swoop_velocity = 5.0
