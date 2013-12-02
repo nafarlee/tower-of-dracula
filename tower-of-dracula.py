@@ -18,7 +18,6 @@ BG_COLOR = pygame.Color('#271b8f')
 
 def main():
     '''Run the game with default settings'''
-
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -210,10 +209,13 @@ class World(object):
                 if box.colliderect(enemy.rect):
                     self.destroy_actor(i)
             box = self.simon.rect
-            if (box.colliderect(enemy) 
-                    and self.simon.invul is False 
-                    and self.simon.is_climbing is False):
-                self.simon.big_toss()
+            if (box.colliderect(enemy)):
+                if box.x < enemy.rect.x:
+                    self.simon.recieve_hit("Right")
+                else:
+                    self.simon.recieve_hit("Left")
+                    
+
 
     def generate_obstacles(self):
         '''Returns a list of rectangle objects based on image mask'''
@@ -313,6 +315,7 @@ class Simon(Actor):
         self.is_big_toss = False
         self.invul = False
         self.invul_frame = -1
+        self.max_invul_frames = 120
 
         self.inputs = []
 
@@ -336,9 +339,29 @@ class Simon(Actor):
                         (files).convert_alpha())
         os.chdir("..")
 
-    def big_toss(self):
-        print "big toss was called"
-        self.invul = True
+    def recieve_hit(self, enemyrelpos):
+        if not self.invul:
+            #self.health -= 1
+            self.invul = True
+            self.invul_frame = 0
+
+            if not self.is_climbing:
+                self.attack_frame = -1
+                self.is_attacking = False
+                self.attack = Rect(0,0,0,0)
+                self.left_jump = False
+                self.right_jump = False
+
+                self.rect.y -= 5
+                self.is_big_toss = True
+                self.is_jumping = True
+                self.velocity = self.jump_velocity
+                if enemyrelpos is "Left":
+                    self.right_jump = True
+                else:
+                    self.left_jump = True
+
+            
 
     def update(self, inputs, world):
         '''update the state of Simon based on inputs and previous state'''
@@ -346,9 +369,20 @@ class Simon(Actor):
         self.movx = 0
         self.movy = 0
         self.image = self.spritesheet["stand.png"]
+
+        if self.invul is False:
+            pass
+        elif self.invul_frame < self.max_invul_frames:
+            self.invul_frame += 1
+        else:
+            self.invul_frame = -1
+            self.invul = False
+
         
         #Check valid input based on state
-        if self.is_jumping:
+        if self.is_big_toss:
+            self.velocity -= self.jump_decay
+        elif self.is_jumping:
             if self.inputs["b"] and self.is_attacking is False:
                 self.is_attacking = True
                 self.attack_frame = 1
@@ -459,6 +493,7 @@ class Simon(Actor):
                     self.is_jumping = False
                     self.left_jump = False
                     self.right_jump = False
+                    self.is_big_toss = False
 
                 for box in world.obstacles:
                     if box.colliderect(self.rect.x, self.rect.y+self.movy, 
@@ -532,6 +567,8 @@ class Simon(Actor):
 
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
+
+        print self.is_big_toss
             
         
 
