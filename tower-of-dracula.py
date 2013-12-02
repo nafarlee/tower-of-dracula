@@ -184,7 +184,6 @@ def main():
         label = font.render(str(world.time), 1, (255,255,255))
         screen.blit(label, (10, 60)) 
 
-        print enemy_type
         label = font.render(enemy_type, 1, (255,255,255))
         screen.blit(label, (10, 110)) 
 
@@ -289,6 +288,7 @@ class Actor(pygame.sprite.Sprite):
         self.direction = "Left"
         self.maxhealth = 1
         self.health = self.maxhealth
+        self.frame = FPS
         return
 
 class Bat(Actor):
@@ -302,14 +302,13 @@ class Bat(Actor):
 
         self.hitboxoffset = 0
         self.rect = Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 50)
-        self.swoop = 180
+        self.swoop = 120
         self.swoop_frame = self.swoop
-        self.swoop_velocity = 5.0
+        self.swoop_velocity = 5
         self.swoop_decay = .1
         self.velocity = 0
         self.xvector = 0
         self.yvector = 0
-        self.frame = FPS
 
     def update(self, world):
         '''enemy AI processing'''
@@ -317,7 +316,10 @@ class Bat(Actor):
         self.movy = 0
         self.image = self.image1
 
-        if self.velocity > self.swoop_decay:
+        print self.velocity
+        print self.swoop_decay
+
+        if self.velocity >= self.swoop_decay:
             self.velocity -= self.swoop_decay
 
         if self.swoop_frame > 0:
@@ -373,6 +375,7 @@ class Zombie(Actor):
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
         self.image1 = pygame.image.load("enemy/zombie1.png")
+        self.image2 = pygame.image.load("enemy/zombie2.png")
         self.image = self.image1
         self.hitboxoffset = 0
 
@@ -391,7 +394,21 @@ class Zombie(Actor):
             self.movy -= self.move
         elif world.simon.rect.y > self.rect.y: 
             self.movy += self.move
-        
+
+        self.rect.x += self.movx
+        self.rect.y += self.movy
+
+        if self.frame > 0:
+            self.frame -= 1
+        else:
+            self.frame = FPS
+
+        f = self.frame / 15
+        if f is 1 or f is 3:
+            self.image = self.image1
+        else:
+            self.image = self.image2
+
         if self.movx < 0:
             self.direction = "Left"
         elif self.movx > 0:
@@ -401,8 +418,6 @@ class Zombie(Actor):
             self.image = pygame.transform.flip(self.image, True, False)
 
 
-        self.rect.x += self.movx
-        self.rect.y += self.movy
 
     def recieve_hit(self):
         '''actions to take when hit by player1's attack'''
