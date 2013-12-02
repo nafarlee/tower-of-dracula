@@ -18,6 +18,8 @@ BG_COLOR = pygame.Color('#271b8f')
 
 def main():
     '''Run the game with default settings'''
+
+    #init
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -42,8 +44,10 @@ def main():
     masker = False
 
     world = World(playerx, playery)
-
+    
+    #Game Loop
     while True:
+        #Input Handling
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -109,8 +113,10 @@ def main():
                     inputs["b"] = False
 
 
+        #MAIN UPDATING PROCEDURE
         world.update(inputs)
 
+        #Drawing Prodecures
         leftx = camerax + WINDOW_WIDTH / 4
         rightx = camerax + WINDOW_WIDTH - (WINDOW_WIDTH/4)
 
@@ -161,14 +167,12 @@ def main():
 
         label = font.render(str(world.simon.health), 1, (255,255,255))
         screen.blit(label, (10, 10)) 
-
+        label = font.render(str(world.time), 1, (255,255,255))
+        screen.blit(label, (10, 60)) 
         pygame.display.flip()
-        fpsclock.tick(FPS)
 
-        if world.frame < FPS:
-            world.frame  += 1
-        else:
-            world.frame = 0
+
+        fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
 
 
@@ -184,6 +188,8 @@ class World(object):
         self.all_sprites.append(self.simon)
         self.gravity = 3
         self.frame = 0
+        self.time_limit = 180
+        self.time = self.time_limit
 
         self.stair_width = 100
         self.stair_height = 40
@@ -206,6 +212,12 @@ class World(object):
 
     def update(self, inputs):
         '''call all world processing routines'''
+        if self.frame < FPS:
+            self.frame  += 1
+        else:
+            self.frame = 0
+            self.time -= 1
+
         self.simon.update(inputs, self)
         for i, enemy in enumerate(self.enemies):
             enemy.update(self)
@@ -582,9 +594,6 @@ class Simon(Actor):
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
 
-        print self.is_big_toss
-            
-        
 
 if __name__ == "__main__":
     main()
