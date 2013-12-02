@@ -242,10 +242,13 @@ class World(object):
         level_collisions = level_mask.get_bounding_rects()
         return level_collisions
 
-    def create_enemy(self, xpos, ypos, type="Zombie"):
+    def create_enemy(self, xpos, ypos, type="Bat"):
         '''create an enemy in the game world'''
         if type is "Zombie":
             self.enemies.append(Zombie(xpos, ypos))
+            self.all_sprites.append(self.enemies[-1])
+        elif type is "Bat":
+            self.enemies.append(Bat(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
         
     def destroy_actor(self, index):
@@ -268,6 +271,69 @@ class Actor(pygame.sprite.Sprite):
         self.maxhealth = 1
         self.health = self.maxhealth
         return
+
+class Bat(Actor):
+    '''Class the represents bats in the game world.'''
+    def __init__(self, xpos, ypos):
+        Actor.__init__(self, xpos, ypos)
+        self.image1 = pygame.image.load("enemy/bat1.png")
+        self.image2 = pygame.image.load("enemy/bat2.png")
+        self.image3 = pygame.image.load("enemy/bat3.png")
+        self.image = self.image1
+
+        self.hitboxoffset = 0
+        self.rect = Rect(xpos+self.hitboxoffset-10/2, ypos-10/2, 10, 10)
+        self.swoop = 100
+        self.swoop_frame = self.swoop
+        self.swoop_velocity = 5
+        self.swoop_decay = .2
+        self.velocity = 0
+        self.xvector = 0
+        self.yvector = 0
+
+    def update(self, world):
+        '''enemy AI processing'''
+        self.movx = 0
+        self.movy = 0
+        self.image = self.image1
+
+        if self.velocity > 0:
+            self.velocity -= self.swoop_decay
+
+        if self.swoop_frame > 0:
+            self.swoop_frame -= 1
+        else:
+            self.swoop_frame = self.swoop
+            self.velocity = self.swoop_velocity
+            self.yvector = world.simon.rect.y
+            self.xvector = world.simon.rect.x
+
+        if self.xvector < self.rect.x:
+            self.movx -= self.velocity
+        elif self.xvector > self.rect.x:
+            self.movx += self.velocity
+        if self.yvector < self.rect.y:
+            self.movy -= self.velocity
+        elif self.yvector > self.rect.y: 
+            self.movy += self.velocity
+
+
+
+        if self.movx < 0:
+            self.direction = "Left"
+        elif self.movx > 0:
+            self.direction = "Right"
+
+        if self.direction is "Right":
+            self.image = pygame.transform.flip(self.image, True, False)
+
+
+        self.rect.x += self.movx
+        self.rect.y += self.movy
+
+        
+
+
 
 class Zombie(Actor):
     '''Class that represents zombies in the game world'''
