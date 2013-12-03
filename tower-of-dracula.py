@@ -84,9 +84,9 @@ def main():
                     camerax = 700
                     cameray = 400
 
-                if event.key == K_1:
+                if event.key == K_1 or event.key == K_KP1:
                     enemy_type = "Zombie"
-                if event.key == K_2:
+                if event.key == K_2 or event.key == K_KP2:
                     enemy_type = "Bat"
 
                 if event.key == K_w:
@@ -179,9 +179,12 @@ def main():
                     pygame.draw.rect(screen, (0, 255, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
 
-        label = font.render(str(world.simon.health), 1, (255,255,255))
+        label = "Health: " + str(world.simon.health) + "/" + str(world.simon.maxhealth)
+        label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 10)) 
-        label = font.render(str(world.time), 1, (255,255,255))
+
+        label = "Time: " + str(world.time)
+        label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 60)) 
 
         label = font.render(enemy_type, 1, (255,255,255))
@@ -235,6 +238,10 @@ class World(object):
         else:
             self.frame = 0
             self.time -= 1
+
+        if self.time is 0:
+            self.simon.die()
+
 
         self.simon.update(inputs, self)
         for i, enemy in enumerate(self.enemies):
@@ -315,9 +322,6 @@ class Bat(Actor):
         self.movx = 0
         self.movy = 0
         self.image = self.image1
-
-        print self.velocity
-        print self.swoop_decay
 
         if self.velocity >= self.swoop_decay:
             self.velocity -= self.swoop_decay
@@ -432,9 +436,8 @@ class Simon(Actor):
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
-        self.maxhealth = 3
+        self.maxhealth = 7
         self.health = self.maxhealth
-
 
         self.is_jumping = False
         self.is_climbing = False
@@ -489,7 +492,7 @@ class Simon(Actor):
                 self.left_jump = False
                 self.right_jump = False
 
-                self.rect.y -= 5
+                self.rect.y -= 3
                 self.is_big_toss = True
                 self.is_jumping = True
                 self.velocity = self.jump_velocity
