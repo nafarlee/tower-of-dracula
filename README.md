@@ -25,8 +25,10 @@ Player 1 Controls:
 Player 2 Controls:
 ==================
 
-- _P_ - Spawn Zombie in random position on map
-- _Left Mouse Click_ - Spawn Zombie at position clicked
+- _P_ - Spawn current enemy type in random position on map
+- _Left Mouse Click_ - Spawn current enemy type at position clicked
+- _1_ - Change enemy type to Zombie
+- _2_ - Change enemy type to Bat
 
 
 Debug Controls:
