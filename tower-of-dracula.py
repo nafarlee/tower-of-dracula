@@ -89,6 +89,9 @@ def main():
                 if event.key == K_2 or event.key == K_KP2:
                     enemy_type = "Bat"
 
+                if event.key == K_9 or event.key == K_KP9:
+                    print world.simon.rect.x, world.simon.rect.y
+
                 if event.key == K_w:
                     inputs["up"] = True
                 if event.key == K_s:
@@ -201,9 +204,11 @@ class World(object):
     '''Class that represents the state of the game world'''
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
-        self.obstacles = self.generate_obstacles()
+        self.obstacles = self.generate_mask_boxes("level/backgroundmask.png")
         self.background = (pygame.image.load
                 ("level/background.png").convert_alpha())
+        self.death  = self.generate_mask_boxes("level/backgrounddeath.png")
+        self.death = self.death[0]
         self.enemies = []
         self.all_sprites = []
         self.all_sprites.append(self.simon)
@@ -244,6 +249,8 @@ class World(object):
 
 
         self.simon.update(inputs, self)
+        if self.simon.rect.colliderect(self.death):
+            self.simon.die()
         for i, enemy in enumerate(self.enemies):
             enemy.update(self)
             if self.simon.is_attacking:
@@ -259,13 +266,12 @@ class World(object):
                     
 
 
-    def generate_obstacles(self):
+    def generate_mask_boxes(self, imagemask):
         '''Returns a list of rectangle objects based on image mask'''
-        background_mask = (pygame.image.load
-                ("level/backgroundmask.png").convert_alpha())
+        background_mask = (pygame.image.load(imagemask).convert_alpha())
         level_mask = pygame.mask.from_surface(background_mask)
-        level_collisions = level_mask.get_bounding_rects()
-        return level_collisions
+        level_boxes = level_mask.get_bounding_rects()
+        return level_boxes
 
     def create_enemy(self, xpos, ypos, type="Bat"):
         '''create an enemy in the game world'''
