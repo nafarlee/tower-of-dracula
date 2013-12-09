@@ -39,8 +39,8 @@ def main():
     fpsclock = pygame.time.Clock()
     camerax = 600
     cameray = 300
-    playerx = 6800
-    playery = 200
+    playerx = 1388
+    playery = 950
     masker = False
 
     enemy_type = "Zombie"
@@ -122,7 +122,6 @@ def main():
                 if event.key == K_LSHIFT:
                     inputs["b"] = False
 
-
         #MAIN UPDATING PROCEDURE
         world.update(inputs)
 
@@ -146,8 +145,6 @@ def main():
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
-
-                    
 
         for sprite in world.all_sprites:
             if camera.colliderect(sprite.rect):
@@ -198,10 +195,9 @@ def main():
 
         pygame.display.flip()
 
-
+        #FRAMERATE MANAGEMENT
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
-
 
 class World(object):
     '''Class that represents the state of the game world'''
@@ -401,6 +397,9 @@ class Zombie(Actor):
         self.image2 = pygame.image.load("enemy/zombie2.png")
         self.image = self.image1
         self.hitboxoffset = 0
+        self.is_grounded = False
+        self.is_vector_set = False
+        self.vectorx = 0
 
         self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
@@ -409,14 +408,28 @@ class Zombie(Actor):
         self.movx = 0
         self.movy = 0
         self.image = self.image1
-        if world.simon.rect.x < self.rect.x:
-            self.movx -= self.move
-        elif world.simon.rect.x > self.rect.x:
-            self.movx += self.move
-        if world.simon.rect.y < self.rect.y:
-            self.movy -= self.move
-        elif world.simon.rect.y > self.rect.y: 
-            self.movy += self.move
+
+        if self.is_grounded:
+            if self.is_vector_set:
+                self.movx = self.vectorx
+            else:
+                if world.simon.rect.x < self.rect.x:
+                    self.vectorx -= self.move
+                elif world.simon.rect.x > self.rect.x:
+                    self.vectorx += self.move
+                self.is_vector_set = True
+
+            newx = self.rect.x + self.movx
+            for box in world.obstacles:
+                if box.colliderect(newx, self.rect.y, self.rect.width, 
+                        self.rect.height):
+                    self.vectorx *= -1
+        else:
+            self.movy += world.gravity
+            foot = self.rect.y + self.rect.height + 5
+            for box in world.obstacles:
+                if box.collidepoint(self.rect.x + self.rect.width/2, foot):
+                    self.is_grounded = True
 
         self.rect.x += self.movx
         self.rect.y += self.movy
