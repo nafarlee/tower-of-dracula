@@ -39,8 +39,8 @@ def main():
     fpsclock = pygame.time.Clock()
     camerax = 600
     cameray = 300
-    playerx = 1388
-    playery = 950
+    playerx = 6800
+    playery = 200
     masker = False
 
     enemy_type = "Zombie"
@@ -156,6 +156,9 @@ def main():
                             sprite.rect.y-camera.y))
 
         if masker:
+            box = world.goal
+            pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
+                    box.y-camera.y, box.width, box.height))
             if world.simon.is_attacking:
                 box = world.simon.attack
                 pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
@@ -209,6 +212,7 @@ class World(object):
                 ("level/background.png").convert_alpha())
         self.death  = self.generate_mask_boxes("level/backgrounddeath.png")
         self.death = self.death[0]
+        self.goal = Rect(6960, 190, 75, 75)
         self.enemies = []
         self.all_sprites = []
         self.all_sprites.append(self.simon)
@@ -251,6 +255,9 @@ class World(object):
         self.simon.update(inputs, self)
         if self.simon.rect.colliderect(self.death):
             self.simon.die()
+        if self.simon.rect.colliderect(self.goal):
+            self.p1win()
+
         for i, enemy in enumerate(self.enemies):
             enemy.update(self)
             if self.simon.is_attacking:
@@ -286,6 +293,12 @@ class World(object):
         '''removes an enemy in the game world'''
         del self.enemies[index]
         del self.all_sprites[index+1]
+
+    def p1win(self):
+        self.simon.die()
+
+    def p2win(self):
+        self.simon.die()
 
 class Actor(pygame.sprite.Sprite):
     '''Base class for all entities in the game world'''
