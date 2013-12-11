@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-'''Castlevania Tower Defense Game'''
+"""Castlevania Tower Defense Game"""
 
 __author__ = 'farley'
 
-import sys, os
+import sys, os, socket, cPickle as pickle
 import pygame
 from random import randrange
 from pygame.locals import *
@@ -15,15 +15,30 @@ WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
 assert WINDOW_HEIGHT >= 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
 
+def clientmain():
+    #initialize
+    #while true:
+        #check for inputs
+        #recieve world
+        #check for inputs
+        #send inputs
+    pass
+
 def main():
-    '''Run the game with default settings'''
+    """Run the game with default settings"""
 
     #init
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    screen2 = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    pygame.mixer.music.load("sounds/vamp.mp3")
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.load("sounds/vamp.mp3")
+    #pygame.mixer.music.play(-1)
+
+    serversocket = socket.socket()
+    serversocket.bind(("127.0.0.1", 7777))
+    serversocket.listen(1)
+
 
     font = pygame.font.SysFont(None, 50)
 
@@ -74,6 +89,7 @@ def main():
                 if event.key == K_c:
                     camerax = world.simon.rect.x - WINDOW_WIDTH /2
                     cameray = world.simon.rect.y - WINDOW_HEIGHT /2
+                    send_actor_positions(world, "127.0.0.1")
 
                 if event.key == K_m:
                     masker = True
@@ -123,6 +139,7 @@ def main():
 
         #MAIN UPDATING PROCEDURE
         world.update(inputs)
+
 
         #Drawing Prodecures
         leftx = camerax + WINDOW_WIDTH / 4
@@ -201,14 +218,28 @@ def main():
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 110)) 
 
+        #NETWORK INTERACTIONS
+
         pygame.display.flip()
 
         #FRAMERATE MANAGEMENT
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
 
+def send_actor_positions(world, socket):
+    """docstring for send_actor_positions"""
+    positions = [world.simon.rect]
+    for enemy in world.enemies:
+        positions.append(enemy.rect)
+
+
+    
+
+
+    
+
 class World(object):
-    '''Class that represents the state of the game world'''
+    """Class that represents the state of the game world"""
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
         self.obstacles = self.generate_mask_boxes("level/backgroundmask.png")
@@ -249,7 +280,7 @@ class World(object):
         ]
 
     def update(self, inputs):
-        '''call all world processing routines'''
+        """call all world processing routines"""
         if self.frame < FPS:
             self.frame  += 1
         else:
@@ -284,14 +315,14 @@ class World(object):
 
 
     def generate_mask_boxes(self, imagemask):
-        '''Returns a list of rectangle objects based on image mask'''
+        """Returns a list of rectangle objects based on image mask"""
         background_mask = (pygame.image.load(imagemask).convert_alpha())
         level_mask = pygame.mask.from_surface(background_mask)
         level_boxes = level_mask.get_bounding_rects()
         return level_boxes
 
     def create_enemy(self, xpos, ypos, type="Bat"):
-        '''create an enemy in the game world'''
+        """create an enemy in the game world"""
         if type is "Ghoul" and self.mp > Ghoul.cost:
             self.mp -= Ghoul.cost
             self.enemies.append(Ghoul(xpos, ypos))
@@ -302,7 +333,7 @@ class World(object):
             self.all_sprites.append(self.enemies[-1])
         
     def destroy_actor(self, index):
-        '''removes an enemy in the game world'''
+        """removes an enemy in the game world"""
         del self.enemies[index]
         del self.all_sprites[index+1]
 
@@ -313,7 +344,7 @@ class World(object):
         self.simon.die()
 
 class Actor(pygame.sprite.Sprite):
-    '''Base class for all entities in the game world'''
+    """Base class for all entities in the game world"""
 
     def __init__(self, xpos, ypos):
         pygame.sprite.Sprite.__init__(self)
@@ -330,7 +361,7 @@ class Actor(pygame.sprite.Sprite):
         return
 
 class Bat(Actor):
-    '''Class the represents bats in the game world.'''
+    """Class the represents bats in the game world."""
 
     cost = 40
 
@@ -352,7 +383,7 @@ class Bat(Actor):
         self.yvector = 0
 
     def update(self, world):
-        '''enemy AI processing'''
+        """enemy AI processing"""
         self.movx = 0
         self.movy = 0
         self.image = self.image1
@@ -409,7 +440,7 @@ class Bat(Actor):
             self.image = pygame.transform.flip(self.image, True, False)
 
 class Ghoul(Actor):
-    '''Class that represents Ghouls in the game world'''
+    """Class that represents Ghouls in the game world"""
 
     cost = 20
 
@@ -426,7 +457,7 @@ class Ghoul(Actor):
         self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
     def update(self, world):
-        '''Enemy AI processing'''
+        """Enemy AI processing"""
         self.movx = 0
         self.movy = 0
         self.image = self.image1
@@ -478,12 +509,12 @@ class Ghoul(Actor):
 
 
     def recieve_hit(self):
-        '''actions to take when hit by player1's attack'''
+        """actions to take when hit by player1's attack"""
         pass
         
 
 class Simon(Actor):
-    '''Class that represents player 1 in the game world'''
+    """Class that represents player 1 in the game world"""
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
 
@@ -558,7 +589,7 @@ class Simon(Actor):
             
 
     def update(self, inputs, world):
-        '''update the state of Simon based on inputs and previous state'''
+        """update the state of Simon based on inputs and previous state"""
         self.inputs = inputs
         self.movx = 0
         self.movy = 0
