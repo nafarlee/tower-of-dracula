@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#Perfect World Runtime - 80 seconds
 '''Castlevania Tower Defense Game'''
 
 __author__ = 'farley'
@@ -43,7 +42,7 @@ def main():
     playery = 950
     masker = False
 
-    enemy_type = "Zombie"
+    enemy_type = "Ghoul"
 
     world = World(playerx, playery)
     
@@ -85,7 +84,7 @@ def main():
                     cameray = 400
 
                 if event.key == K_1 or event.key == K_KP1:
-                    enemy_type = "Zombie"
+                    enemy_type = "Ghoul"
                 if event.key == K_2 or event.key == K_KP2:
                     enemy_type = "Bat"
 
@@ -186,11 +185,20 @@ def main():
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 10)) 
 
+        label = "MP: " + str(world.mp)
+        label = font.render(label, 1, (255,255,255))
+        screen.blit(label, (10, 160)) 
+
         label = "Time: " + str(world.time)
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 60)) 
 
-        label = font.render(enemy_type, 1, (255,255,255))
+        label = enemy_type + ": "
+        if enemy_type is "Ghoul":
+            label += str(Ghoul.cost)
+        else:
+            label += str(Bat.cost)
+        label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 110)) 
 
         pygame.display.flip()
@@ -216,6 +224,10 @@ class World(object):
         self.frame = 0
         self.time_limit = 180
         self.time = self.time_limit
+
+        self.mp_max = 70
+        self.mp = self.mp_max
+        self.mp_regen = 10
 
         self.stair_width = 100
         self.stair_height = 40
@@ -243,6 +255,8 @@ class World(object):
         else:
             self.frame = 0
             self.time -= 1
+            if self.mp < self.mp_max:
+                self.mp += self.mp_regen
 
         if self.time is 0:
             self.simon.die()
@@ -278,10 +292,12 @@ class World(object):
 
     def create_enemy(self, xpos, ypos, type="Bat"):
         '''create an enemy in the game world'''
-        if type is "Zombie":
-            self.enemies.append(Zombie(xpos, ypos))
+        if type is "Ghoul" and self.mp > Ghoul.cost:
+            self.mp -= Ghoul.cost
+            self.enemies.append(Ghoul(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
-        elif type is "Bat":
+        elif type is "Bat" and self.mp > Bat.cost:
+            self.mp -= Bat.cost
             self.enemies.append(Bat(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
         
@@ -315,6 +331,9 @@ class Actor(pygame.sprite.Sprite):
 
 class Bat(Actor):
     '''Class the represents bats in the game world.'''
+
+    cost = 40
+
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
         self.image1 = pygame.image.load("enemy/bat1.png")
@@ -389,17 +408,20 @@ class Bat(Actor):
         if self.direction is "Right":
             self.image = pygame.transform.flip(self.image, True, False)
 
-class Zombie(Actor):
-    '''Class that represents zombies in the game world'''
+class Ghoul(Actor):
+    '''Class that represents Ghouls in the game world'''
+
+    cost = 20
+
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image1 = pygame.image.load("enemy/zombie1.png")
-        self.image2 = pygame.image.load("enemy/zombie2.png")
+        self.image1 = pygame.image.load("enemy/ghoul1.png")
+        self.image2 = pygame.image.load("enemy/ghoul2.png")
         self.image = self.image1
         self.hitboxoffset = 0
         self.is_grounded = False
         self.is_vector_set = False
-        self.vectorx = 0
+        self.xvector = 0
 
         self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
@@ -411,19 +433,19 @@ class Zombie(Actor):
 
         if self.is_grounded:
             if self.is_vector_set:
-                self.movx = self.vectorx
+                self.movx = self.xvector
             else:
                 if world.simon.rect.x < self.rect.x:
-                    self.vectorx -= self.move
+                    self.xvector -= self.move
                 elif world.simon.rect.x > self.rect.x:
-                    self.vectorx += self.move
+                    self.xvector += self.move
                 self.is_vector_set = True
 
             newx = self.rect.x + self.movx
             for box in world.obstacles:
                 if box.colliderect(newx, self.rect.y, self.rect.width, 
                         self.rect.height):
-                    self.vectorx *= -1
+                    self.xvector *= -1
         else:
             self.movy += world.gravity
             foot = self.rect.y + self.rect.height + 5
@@ -684,7 +706,7 @@ class Simon(Actor):
                     newx = self.rect.x
             self.rect.x = newx
 
-#Sprite processing
+       #Sprite processing
         if self.is_jumping is False:
             if self.movx is 0:
                 self.is_standing = True
