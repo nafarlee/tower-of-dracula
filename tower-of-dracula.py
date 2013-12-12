@@ -14,20 +14,13 @@ assert WINDOW_WIDTH >= 640, "Window is gonna be too short"
 WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
 assert WINDOW_HEIGHT >= 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
-server_ip = "localhost"
-client_ip = None
 
 def choose_player_type():
     """Choose which player to be"""
     plyr_type = raw_input("Would you like to play as Simon or Dracula? ").lower()
 
     if plyr_type[0] == 's':
-        network_type = raw_input("Play multiplayer? y/n ")
-        if network_type is 'y':
-            is_multiplayer = True
-        else:
-            is_multiplayer = False
-        first_player_main(is_multiplayer)
+        first_player_main()
 
     elif plyr_type[0] == 'd':
         second_player_main()
@@ -36,11 +29,15 @@ def choose_player_type():
         print "invalid choice"
         choose_player_type()
 
-    return
-    
-
-def first_player_main(is_multiplayer):
+def first_player_main():
     """Play the game as Simon, with or without multiplayer"""
+    network_type = raw_input("Play multiplayer? y/n ")
+    if network_type is 'y':
+        is_multiplayer = True
+    else:
+        is_multiplayer = False
+
+    server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
 
     #init
     pygame.init()
@@ -263,6 +260,7 @@ def second_player_main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('', 7777))
     s.listen(1)
+    print "Waiting for connection now at ", str(socket.gethostbyname(socket.gethostname()))
     connection, address = s.accept()
 
     while True:
@@ -312,7 +310,6 @@ def send_actor_positions(world, socket):
     """docstring for send_actor_positions"""
 
     pickledinfo = pickle.dumps(world.simon.rect)
-    print pickledinfo
     socket.sendall(pickledinfo)
 
 def recieve_actor_positions(connection):
