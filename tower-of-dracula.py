@@ -14,30 +14,44 @@ assert WINDOW_WIDTH >= 640, "Window is gonna be too short"
 WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
 assert WINDOW_HEIGHT >= 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
+server_ip = "localhost"
+client_ip = None
 
-def clientmain():
-    #initialize
-    #while true:
-        #check for inputs
-        #recieve world
-        #check for inputs
-        #send inputs
-    pass
+def choose_player_type():
+    """Choose which player to be"""
+    plyr_type = raw_input("Would you like to play as Simon or Dracula? ").lower()
 
-def main():
-    """Run the game with default settings"""
+    if plyr_type[0] == 's':
+        network_type = raw_input("Play multiplayer? y/n ")
+        if network_type is 'y':
+            is_multiplayer = True
+        else:
+            is_multiplayer = False
+        first_player_main(is_multiplayer)
+
+    elif plyr_type[0] == 'd':
+        second_player_main()
+
+    else:
+        print "invalid choice"
+        choose_player_type()
+
+    return
+    
+
+def first_player_main(is_multiplayer):
+    """Play the game as Simon, with or without multiplayer"""
 
     #init
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    screen2 = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
     #pygame.mixer.music.load("sounds/vamp.mp3")
     #pygame.mixer.music.play(-1)
 
-    serversocket = socket.socket()
-    serversocket.bind(("127.0.0.1", 7777))
-    serversocket.listen(1)
+    if is_multiplayer:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((server_ip, 7777))
 
 
     font = pygame.font.SysFont(None, 50)
@@ -89,7 +103,6 @@ def main():
                 if event.key == K_c:
                     camerax = world.simon.rect.x - WINDOW_WIDTH /2
                     cameray = world.simon.rect.y - WINDOW_HEIGHT /2
-                    send_actor_positions(world, "127.0.0.1")
 
                 if event.key == K_m:
                     masker = True
@@ -219,6 +232,8 @@ def main():
         screen.blit(label, (10, 110)) 
 
         #NETWORK INTERACTIONS
+        if is_multiplayer:
+            send_actor_positions(world, client_socket)
 
         pygame.display.flip()
 
@@ -226,17 +241,87 @@ def main():
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
 
+def second_player_main():
+    """Play the game as Dracula"""
+
+    #init
+    pygame.init()
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+    #pygame.mixer.music.load("sounds/vamp.mp3")
+    #pygame.mixer.music.play(-1)
+
+    font = pygame.font.SysFont(None, 50)
+
+    fpsclock = pygame.time.Clock()
+    camerax = 600
+    cameray = 300
+
+    background = pygame.image.load("level/background.png").convert_alpha()
+    simon = Simon(0, 0)
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('', 7777))
+    s.listen(1)
+    connection, address = s.accept()
+
+    while True:
+        #Input Handling
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                move = 30
+                if event.key == K_UP:
+                    cameray -= move
+                if event.key == K_DOWN:
+                    cameray += move
+                if event.key == K_LEFT:
+                    camerax -= move
+                if event.key == K_RIGHT:
+                    camerax += move
+
+        camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
+        screen.fill(BG_COLOR)
+        screen.blit(background, (-camerax, -cameray))
+
+        
+        simon_rect = recieve_actor_positions(connection)
+        if camera.colliderect(simon_rect):
+                screen.blit(simon.image, (simon_rect.x-camera.x-simon.hitboxoffset, simon_rect.y-camera.y))
+
+
+
+        '''
+        for sprite in world.all_sprites:
+            if camera.colliderect(sprite.rect):
+                screen.blit(sprite.image,
+                           (sprite.rect.x-camera.x-sprite.hitboxoffset,
+                            sprite.rect.y-camera.y))
+        '''
+
+        pygame.display.flip()
+        fpsclock.tick(FPS)
+        pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
+
+    connection.close()
+    pass
+
 def send_actor_positions(world, socket):
     """docstring for send_actor_positions"""
-    positions = [world.simon.rect]
-    for enemy in world.enemies:
-        positions.append(enemy.rect)
 
+    pickledinfo = pickle.dumps(world.simon.rect)
+    print pickledinfo
+    socket.sendall(pickledinfo)
 
-    
+def recieve_actor_positions(connection):
+    data = connection.recv(1024)
+    if not data:
+        return None
+    else:
+        return pickle.loads(str(data))
 
-
-    
 
 class World(object):
     """Class that represents the state of the game world"""
@@ -514,6 +599,8 @@ class Ghoul(Actor):
         
 
 class Simon(Actor):
+
+    static_image = pygame.image.load("simon/stand.png")
     """Class that represents player 1 in the game world"""
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
@@ -798,5 +885,4 @@ class Simon(Actor):
 
 
 if __name__ == "__main__":
-    main()
-
+    choose_player_type()
