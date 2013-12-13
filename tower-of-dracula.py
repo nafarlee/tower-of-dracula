@@ -37,7 +37,6 @@ def first_player_main():
     else:
         is_multiplayer = False
 
-    server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
 
     #init
     pygame.init()
@@ -48,6 +47,7 @@ def first_player_main():
 
     if is_multiplayer:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
         client_socket.connect((server_ip, 7777))
 
 
@@ -307,9 +307,12 @@ def second_player_main():
     pass
 
 def send_actor_positions(world, socket):
-    """docstring for send_actor_positions"""
+    """send the positions of all actors to player 2"""
 
-    pickledinfo = pickle.dumps(world.simon.rect)
+    actor_positions = [("S", world.simon.rect)]
+    for enemy in world.enemies:
+        pass
+    pickledinfo = pickle.dumps(actor_positions)
     socket.sendall(pickledinfo)
 
 def recieve_actor_positions(connection):
@@ -405,11 +408,11 @@ class World(object):
 
     def create_enemy(self, xpos, ypos, type="Bat"):
         """create an enemy in the game world"""
-        if type is "Ghoul" and self.mp > Ghoul.cost:
+        if type is "Ghoul" and self.mp >= Ghoul.cost:
             self.mp -= Ghoul.cost
             self.enemies.append(Ghoul(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
-        elif type is "Bat" and self.mp > Bat.cost:
+        elif type is "Bat" and self.mp >= Bat.cost:
             self.mp -= Bat.cost
             self.enemies.append(Bat(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
