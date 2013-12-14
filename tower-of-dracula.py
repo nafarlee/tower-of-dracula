@@ -42,6 +42,7 @@ def first_player_main():
 
     if is_multiplayer:
         server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
+        server_port = int(raw_input("Enter the port number of the server: "))
         if server_ip == "":
             server_ip = "localhost"
 
@@ -55,8 +56,7 @@ def first_player_main():
 
     if is_multiplayer:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((server_ip, 7777))
-
+        client_socket.connect((server_ip, server_port))
 
     font = pygame.font.SysFont(None, 50)
     fpsclock = pygame.time.Clock()
@@ -73,7 +73,7 @@ def first_player_main():
     cameray = 300
     playerx = 1388
     playery = 950
-    masker = False
+    debugging_masks = False
 
     enemy_type = "Ghoul"
 
@@ -97,9 +97,9 @@ def first_player_main():
 
             if event.type == KEYDOWN:
                 if event.key == K_m:
-                    masker = True
+                    debugging_masks = True
                 if event.key == K_b:
-                    masker = False
+                    debugging_masks = False
 
                 if not is_multiplayer:
                     if event.key == K_1 or event.key == K_KP1:
@@ -117,7 +117,7 @@ def first_player_main():
                     inputs["right"] = True
                 if event.key == K_SPACE:
                     inputs["a"] = True
-                if event.key == K_LSHIFT:
+                if event.key == K_LSHIFT or event.key == K_RSHIFT:
                     inputs["b"] = True
 
             if event.type == KEYUP:
@@ -131,7 +131,7 @@ def first_player_main():
                     inputs["right"] = False
                 if event.key == K_SPACE:
                     inputs["a"] = False
-                if event.key == K_LSHIFT:
+                if event.key == K_LSHIFT or event.key == K_RSHIFT:
                     inputs["b"] = False
 
         #MAIN UPDATING PROCEDURE
@@ -152,7 +152,7 @@ def first_player_main():
         if world.simon.rect.y < topy:
             cameray -= 1
         elif world.simon.rect.y > bottomy:
-            cameray += 2
+            cameray += 5
 
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
@@ -164,36 +164,43 @@ def first_player_main():
                            (sprite.rect.x-camera.x-sprite.hitboxoffset,
                             sprite.rect.y-camera.y))
 
-        if masker:
+        if debugging_masks == True:
             box = world.goal
             pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
                     box.y-camera.y, box.width, box.height))
+
             if world.simon.is_attacking:
                 box = world.simon.attack
                 pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
                                  box.y-camera.y, box.width, box.height))
+
             for box in world.obstacles:
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
+
             for steps in world.top_stairs:
                 box = Rect((steps[0] - world.stair_width/2, steps[1]), 
                            (world.stair_width, world.stair_height))
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
+
             for steps in world.bot_stairs:
                 box = Rect((steps[0] - world.stair_width/2, steps[1]), 
                            (world.stair_width, world.stair_height))
+
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
+
             for enemy in world.enemies:
                 box = enemy.rect
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 255, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
 
+        #HUD
         label = "Health: " + str(world.simon.health) + "/" + str(world.simon.maxhealth)
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 10)) 
@@ -227,9 +234,9 @@ def first_player_main():
                 world.create_enemy(enemyx, enemyy, enemytype)
             
         if world.winner == 1:
-            youwin(screen)
+            youwin(screen, client_socket)
         elif world.winner == 2:
-            youlose(screen)
+            youlose(screen, client_socket)
 
         pygame.display.flip()
 
@@ -240,7 +247,8 @@ def first_player_main():
 def second_player_main():
     """Play the game as Dracula"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', 7777))
+    listen_port = int(raw_input("Enter the port number to listen on: "))
+    s.bind(('', listen_port))
     s.listen(1)
     print "Waiting for connection now at", str(socket.gethostbyname(socket.gethostname()))
     connection, address = s.accept()
@@ -259,10 +267,12 @@ def second_player_main():
     camerax = 600
     cameray = 300
 
+    #data resources
     background = pygame.image.load("level/background.png").convert_alpha()
     simon = Simon(-1, -1)
     ghoul = Ghoul(-1, -1)
     bat = Bat(-1, -1)
+
     is_panning_up =     False
     is_panning_down =   False
     is_panning_left =   False
@@ -275,6 +285,7 @@ def second_player_main():
     while True:
         #Input Handling
         enemy_spawn = None
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -337,9 +348,9 @@ def second_player_main():
             enemies = world_report["Enemies"]
             winner = world_report["Winner"]
             if winner == 1:
-                youlose(screen)
+                youlose(screen, connection)
             elif winner == 2:
-                youwin(screen)
+                youwin(screen, connection)
 
         if camera.colliderect(simon_rect):
             simonx = simon_rect.x - camera.x - simon.hitboxoffset
@@ -377,6 +388,10 @@ def second_player_main():
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 160)) 
 
+        label = "[1] Ghoul | Bat [2]"
+        label = font.render(label, 1, (255,255,255))
+        screen.blit(label, (10, 210)) 
+
         pygame.display.flip()
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
@@ -408,6 +423,10 @@ def receive_world_report(connection):
     else:
         return pickle.loads(str(data))
 
+def send_spawn_input(enemy_spawn_summary, socket):
+    """send spawn inputs to the first player"""
+    socket.sendall(pickle.dumps(enemy_spawn_summary))
+
 def receive_spawn_input(connection):
     """recieve possible spawn inputs from the second player"""
     data = connection.recv(1024)
@@ -416,11 +435,7 @@ def receive_spawn_input(connection):
     else:
         return pickle.loads(str(data))
 
-def send_spawn_input(enemy_spawn_summary, socket):
-    """send spawn inputs to the first player"""
-    socket.sendall(pickle.dumps(enemy_spawn_summary))
-
-def youwin(screen):
+def youwin(screen, socket):
     font_size = 100
     font = pygame.font.SysFont(None, font_size)
 
@@ -433,10 +448,11 @@ def youwin(screen):
     pygame.display.flip()
 
     pygame.time.delay(4000)
+    socket.close()
     pygame.quit()
     sys.exit()
 
-def youlose(screen):
+def youlose(screen, socket):
     font_size = 100
     font = pygame.font.SysFont(None, font_size)
 
@@ -449,6 +465,7 @@ def youlose(screen):
     pygame.display.flip()
 
     pygame.time.delay(4000)
+    socket.close()
     pygame.quit()
     sys.exit()
 
@@ -735,7 +752,7 @@ class Simon(Actor):
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
-        self.maxhealth = 3
+        self.maxhealth = 9
         self.health = self.maxhealth
 
         self.is_jumping = False
