@@ -242,7 +242,7 @@ def second_player_main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('', 7777))
     s.listen(1)
-    print "Waiting for connection now at ", str(socket.gethostbyname(socket.gethostname()))
+    print "Waiting for connection now at", str(socket.gethostbyname(socket.gethostname()))
     connection, address = s.accept()
 
     #init
@@ -310,7 +310,6 @@ def second_player_main():
                 xpos = mousex + camerax
                 ypos = mousey + cameray
                 enemy_spawn = (xpos, ypos, enemy_type)
-                print enemy_spawn
         
         if is_panning_up:
             cameray -= camera_pan_amount
@@ -539,14 +538,16 @@ class World(object):
 
     def create_enemy(self, xpos, ypos, type="Bat"):
         """create an enemy in the game world"""
-        if type == "Ghoul" and self.mp >= Ghoul.cost:
-            self.mp -= Ghoul.cost
-            self.enemies.append(Ghoul(xpos, ypos))
-            self.all_sprites.append(self.enemies[-1])
-        elif type == "Bat" and self.mp >= Bat.cost:
-            self.mp -= Bat.cost
-            self.enemies.append(Bat(xpos, ypos))
-            self.all_sprites.append(self.enemies[-1])
+        unspawnable_box = self.simon.rect.inflate(300, 300)
+        if unspawnable_box.collidepoint(xpos, ypos) == False:
+            if type == "Ghoul" and self.mp >= Ghoul.cost:
+                self.mp -= Ghoul.cost
+                self.enemies.append(Ghoul(xpos, ypos))
+                self.all_sprites.append(self.enemies[-1])
+            elif type == "Bat" and self.mp >= Bat.cost:
+                self.mp -= Bat.cost
+                self.enemies.append(Bat(xpos, ypos))
+                self.all_sprites.append(self.enemies[-1])
         
     def destroy_actor(self, index):
         """removes an enemy in the game world"""
