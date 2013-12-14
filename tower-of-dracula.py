@@ -1,22 +1,19 @@
 #!/usr/bin/env python
 """Castlevania Tower Defense Game"""
 
-__author__ = 'farley'
+__author__ = 'Nicholas Farley'
 
 import sys, os, socket, cPickle as pickle
 import pygame
-from random import randrange
 from pygame.locals import *
 
 BG_COLOR = pygame.Color('#271b8f')
 FPS = 60
 
-#WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
-WINDOW_WIDTH = 640
+WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
 assert WINDOW_WIDTH >= 640, "Window == gonna be too short"
 
-#WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
-WINDOW_HEIGHT = 480
+WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
 assert WINDOW_HEIGHT >= 480, "Window == gonna be too thin"
 
 
@@ -62,6 +59,7 @@ def first_player_main():
 
 
     font = pygame.font.SysFont(None, 50)
+    fpsclock = pygame.time.Clock()
 
     inputs = {
             "up":       False, 
@@ -71,7 +69,6 @@ def first_player_main():
             "a":        False, 
             "b":        False
     }
-    fpsclock = pygame.time.Clock()
     camerax = 600
     cameray = 300
     playerx = 1388
@@ -90,11 +87,12 @@ def first_player_main():
                 pygame.quit()
                 sys.exit()
 
-            if event.type == MOUSEBUTTONUP:
-                mousex, mousey = event.pos
-                xpos = mousex + camerax
-                ypos = mousey + cameray
-                world.create_enemy(xpos, ypos, enemy_type)
+            if not is_multiplayer:
+                if event.type == MOUSEBUTTONUP:
+                    mousex, mousey = event.pos
+                    xpos = mousex + camerax
+                    ypos = mousey + cameray
+                    world.create_enemy(xpos, ypos, enemy_type)
 
 
             if event.type == KEYDOWN:
@@ -103,10 +101,11 @@ def first_player_main():
                 if event.key == K_b:
                     masker = False
 
-                if event.key == K_1 or event.key == K_KP1:
-                    enemy_type = "Ghoul"
-                if event.key == K_2 or event.key == K_KP2:
-                    enemy_type = "Bat"
+                if not is_multiplayer:
+                    if event.key == K_1 or event.key == K_KP1:
+                        enemy_type = "Ghoul"
+                    if event.key == K_2 or event.key == K_KP2:
+                        enemy_type = "Bat"
 
                 if event.key == K_w:
                     inputs["up"] = True
@@ -138,8 +137,7 @@ def first_player_main():
         #MAIN UPDATING PROCEDURE
         world.update(inputs)
 
-
-        #Drawing Prodecures
+        #BEGIN DRAWING PROCEDURES
         leftx = camerax + WINDOW_WIDTH / 4
         rightx = camerax + WINDOW_WIDTH - (WINDOW_WIDTH/4)
 
@@ -215,6 +213,7 @@ def first_player_main():
             label = "MP: " + str(world.mp)
             label = font.render(label, 1, (255,255,255))
             screen.blit(label, (10, 160)) 
+        #END DRAWING PROCEDURES
 
 
         #NETWORK INTERACTIONS
@@ -227,6 +226,10 @@ def first_player_main():
                 enemytype = enemy_spawn[2]
                 world.create_enemy(enemyx, enemyy, enemytype)
             
+        if world.winner == 1:
+            youwin(screen)
+        elif world.winner == 2:
+            youlose(screen)
 
         pygame.display.flip()
 
@@ -236,8 +239,6 @@ def first_player_main():
 
 def second_player_main():
     """Play the game as Dracula"""
-
-
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('', 7777))
     s.listen(1)
@@ -335,8 +336,11 @@ def second_player_main():
             monster_points = world_report["MP"]
             timeleft = world_report["Time"]
             enemies = world_report["Enemies"]
-
-
+            winner = world_report["Winner"]
+            if winner == 1:
+                youlose(screen)
+            elif winner == 2:
+                youwin(screen)
 
         if camera.colliderect(simon_rect):
             simonx = simon_rect.x - camera.x - simon.hitboxoffset
@@ -374,8 +378,6 @@ def second_player_main():
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 160)) 
 
-
-
         pygame.display.flip()
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
@@ -389,7 +391,8 @@ def send_world_report(world, socket):
         "Health": world.simon.health,
         "MP": world.mp,
         "Time": world.time,
-        "Enemies": []
+        "Enemies": [],
+        "Winner": world.winner
     }
 
     for enemy in world.enemies:
@@ -418,6 +421,38 @@ def send_spawn_input(enemy_spawn_summary, socket):
     """send spawn inputs to the first player"""
     socket.sendall(pickle.dumps(enemy_spawn_summary))
 
+def youwin(screen):
+    font_size = 100
+    font = pygame.font.SysFont(None, font_size)
+
+    label = "YOU WIN!"
+    label = font.render(label, 1, (255,255,255))
+    labelx = WINDOW_WIDTH/3 - font_size
+    labely = WINDOW_HEIGHT/2
+
+    screen.blit(label, (labelx, labely)) 
+    pygame.display.flip()
+
+    pygame.time.delay(4000)
+    pygame.quit()
+    sys.exit()
+
+def youlose(screen):
+    font_size = 100
+    font = pygame.font.SysFont(None, font_size)
+
+    label = "YOU LOSE!"
+    label = font.render(label, 1, (255,255,255))
+    labelx = WINDOW_WIDTH/3 - font_size
+    labely = WINDOW_HEIGHT/2
+
+    screen.blit(label, (labelx, labely)) 
+    pygame.display.flip()
+
+    pygame.time.delay(4000)
+    pygame.quit()
+    sys.exit()
+
 
 class World(object):
     """Class that represents the state of the game world"""
@@ -436,6 +471,7 @@ class World(object):
         self.frame = 0
         self.time_limit = 180
         self.time = self.time_limit
+        self.winner = 0
 
         self.mp_max = 70
         self.mp = self.mp_max
@@ -470,12 +506,13 @@ class World(object):
             if self.mp < self.mp_max:
                 self.mp += self.mp_regen
 
-        if self.time == 0:
-            self.p2win()
-
-
         self.simon.update(inputs, self)
+
+        if self.simon.health == 0:
+            self.p2win()
         if self.simon.rect.colliderect(self.death):
+            self.p2win()
+        if self.time == 0:
             self.p2win()
         if self.simon.rect.colliderect(self.goal):
             self.p1win()
@@ -517,10 +554,10 @@ class World(object):
         del self.all_sprites[index+1]
 
     def p1win(self):
-        self.simon.die()
+        self.winner = 1
 
     def p2win(self):
-        self.simon.die()
+        self.winner = 2
 
 class Actor(pygame.sprite.Sprite):
     """Base class for all entities in the game world"""
@@ -697,7 +734,7 @@ class Simon(Actor):
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
-        self.maxhealth = 7
+        self.maxhealth = 3
         self.health = self.maxhealth
 
         self.is_jumping = False
@@ -734,15 +771,9 @@ class Simon(Actor):
                         (files).convert_alpha())
         os.chdir("..")
 
-    def die(self):
-        pygame.quit()
-        sys.exit()
-
     def receive_hit(self, enemyrelpos):
         if not self.invul:
             self.health -= 1
-            if self.health == 0:
-                self.die()
             self.invul = True
             self.invul_frame = 0
 
