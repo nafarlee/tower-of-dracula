@@ -382,21 +382,19 @@ def second_player_main():
         elif enemy_type == "Bat":
             label += str(Bat.cost)
         label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 110)) 
+        screen.blit(label, (10, WINDOW_HEIGHT-50)) 
 
         label = "MP: " + str(monster_points)
         label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 160)) 
+        screen.blit(label, (10, WINDOW_HEIGHT-100)) 
 
         label = "[1] Ghoul | Bat [2]"
         label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 210)) 
+        screen.blit(label, (10, WINDOW_HEIGHT-150)) 
 
         pygame.display.flip()
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
-
-    connection.close()
 
 def send_world_report(world, socket):
     """send the pertinent world information to the second player"""
@@ -485,7 +483,7 @@ class World(object):
         self.all_sprites.append(self.simon)
         self.gravity = 3
         self.frame = 0
-        self.time_limit = 180
+        self.time_limit = 240
         self.time = self.time_limit
         self.winner = 0
 
