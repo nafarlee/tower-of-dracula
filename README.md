@@ -41,3 +41,8 @@ Debug Controls:
 
 - _M_ - Activate Hitbox visibility mode
 - _B_ - Deactivate Hitbox visibility mode
+
+Credits:
+========
+
+Thank you to [Spriter's Resource](http://www.spriters-resource.com/) for all of the sprite rips.
