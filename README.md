@@ -1,13 +1,13 @@
 Tower of Dracula
 ================
 
-Small multiplayer game based on a certain NES game.
+Small multiplayer game based on a certain NES game. Player 1 assumes the role of a vampire hunter trying to make his way to a big glowing orb for some reason. Player 2 plays the part of a master vampire that can summon minions I guess? As Player 1, you will have to destroy enemies as you make your way to the orb with your whip. As Player 2, you must track the progress of Player 1 and try to prevent him from reaching his goal in time by creating "monstahs" to impede his path.
 
 Tested on:
 ==========
 
-- Python 2.7.5
-- Pygame 1.9.1
+- [Python](http://www.python.org/) 2.7.5
+- [Pygame](http://www.pygame.org/) 1.9.1
 
 Player 1 Controls:
 ==================
@@ -16,7 +16,7 @@ Player 1 Controls:
 - _D_ - Walk Right
 - _W_ - Ascend Stairs (If near staircase)
 - _S_ - Descend Stairs (If near staircase)
-- _Left Shift_ - Attack with Whip (AIR OK) (STAIR OK)
+- _Left Shift_ or _Right Shift_ - Attack with Whip (AIR OK) (STAIR OK)
 - _Space_ - Jump Vertically
 - _Space + A_ - Jump Left
 - _Space + D_ - Jump Right
@@ -25,17 +25,17 @@ Player 1 Controls:
 Player 2 Controls:
 ==================
 
-- _P_ - Spawn current enemy type in random position on map
 - _Left Mouse Click_ - Spawn current enemy type at position clicked
-- _1_ - Change enemy type to Zombie
+- _1_ - Change enemy type to Ghoul
 - _2_ - Change enemy type to Bat
+- _A_ - Pan Camera Left
+- _D_ - Pan Camera Right
+- _S_ - Pan Camera Down
+- _W_ - Pan Camera Up
 
 
 Debug Controls:
 ===============
 
-- _C_ - Center Camera on Player 1
-- _O_ - Center Camera on beginning of level
 - _M_ - Activate Hitbox visibility mode
 - _B_ - Deactivate Hitbox visibility mode
-- _Arrow Keys_ - Move the Camera manually
