@@ -8,12 +8,17 @@ import pygame
 from random import randrange
 from pygame.locals import *
 
-FPS = 60
-WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
-assert WINDOW_WIDTH >= 640, "Window is gonna be too short"
-WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
-assert WINDOW_HEIGHT >= 480, "Window is gonna be too thin"
 BG_COLOR = pygame.Color('#271b8f')
+FPS = 60
+
+#WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
+WINDOW_WIDTH = 640
+assert WINDOW_WIDTH >= 640, "Window == gonna be too short"
+
+#WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
+WINDOW_HEIGHT = 480
+assert WINDOW_HEIGHT >= 480, "Window == gonna be too thin"
+
 
 def choose_player_type():
     """Choose which player to be"""
@@ -32,22 +37,27 @@ def choose_player_type():
 def first_player_main():
     """Play the game as Simon, with or without multiplayer"""
     network_type = raw_input("Play multiplayer? y/n ")
-    if network_type is 'y':
+
+    if network_type == 'y':
         is_multiplayer = True
     else:
         is_multiplayer = False
+
+    if is_multiplayer:
+        server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
+        if server_ip == "":
+            server_ip = "localhost"
 
 
     #init
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    #pygame.mixer.music.load("sounds/vamp.mp3")
-    #pygame.mixer.music.play(-1)
+    pygame.mixer.music.load("sounds/vamp.mp3")
+    pygame.mixer.music.play(-1)
 
     if is_multiplayer:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
         client_socket.connect((server_ip, 7777))
 
 
@@ -80,7 +90,7 @@ def first_player_main():
                 pygame.quit()
                 sys.exit()
 
-            if event.type is MOUSEBUTTONUP:
+            if event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 xpos = mousex + camerax
                 ypos = mousey + cameray
@@ -88,34 +98,15 @@ def first_player_main():
 
 
             if event.type == KEYDOWN:
-                move = 30
-                if event.key == K_UP:
-                    cameray -= move
-                if event.key == K_DOWN:
-                    cameray += move
-                if event.key == K_LEFT:
-                    camerax -= move
-                if event.key == K_RIGHT:
-                    camerax += move
-                if event.key == K_c:
-                    camerax = world.simon.rect.x - WINDOW_WIDTH /2
-                    cameray = world.simon.rect.y - WINDOW_HEIGHT /2
-
                 if event.key == K_m:
                     masker = True
                 if event.key == K_b:
                     masker = False
-                if event.key == K_o:
-                    camerax = 700
-                    cameray = 400
 
                 if event.key == K_1 or event.key == K_KP1:
                     enemy_type = "Ghoul"
                 if event.key == K_2 or event.key == K_KP2:
                     enemy_type = "Bat"
-
-                if event.key == K_9 or event.key == K_KP9:
-                    print world.simon.rect.x, world.simon.rect.y
 
                 if event.key == K_w:
                     inputs["up"] = True
@@ -129,9 +120,6 @@ def first_player_main():
                     inputs["a"] = True
                 if event.key == K_LSHIFT:
                     inputs["b"] = True
-
-                if event.key == K_p:
-                    world.create_enemy(randrange(1400), randrange(800))
 
             if event.type == KEYUP:
                 if event.key == K_w:
@@ -211,26 +199,34 @@ def first_player_main():
         label = "Health: " + str(world.simon.health) + "/" + str(world.simon.maxhealth)
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 10)) 
-
-        label = "MP: " + str(world.mp)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 160)) 
-
         label = "Time: " + str(world.time)
         label = font.render(label, 1, (255,255,255))
         screen.blit(label, (10, 60)) 
 
-        label = enemy_type + ": "
-        if enemy_type is "Ghoul":
-            label += str(Ghoul.cost)
-        else:
-            label += str(Bat.cost)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 110)) 
+        if not is_multiplayer:
+            label = enemy_type + ": "
+            if enemy_type == "Ghoul":
+                label += str(Ghoul.cost)
+            elif enemy_type == "Bat":
+                label += str(Bat.cost)
+            label = font.render(label, 1, (255,255,255))
+            screen.blit(label, (10, 110)) 
+
+            label = "MP: " + str(world.mp)
+            label = font.render(label, 1, (255,255,255))
+            screen.blit(label, (10, 160)) 
+
 
         #NETWORK INTERACTIONS
         if is_multiplayer:
-            send_actor_positions(world, client_socket)
+            send_world_report(world, client_socket)
+            enemy_spawn = receive_spawn_input(client_socket)
+            if enemy_spawn != None:
+                enemyx = enemy_spawn[0]
+                enemyy = enemy_spawn[1]
+                enemytype = enemy_spawn[2]
+                world.create_enemy(enemyx, enemyy, enemytype)
+            
 
         pygame.display.flip()
 
@@ -241,10 +237,18 @@ def first_player_main():
 def second_player_main():
     """Play the game as Dracula"""
 
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('', 7777))
+    s.listen(1)
+    print "Waiting for connection now at ", str(socket.gethostbyname(socket.gethostname()))
+    connection, address = s.accept()
+
     #init
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+    #music commented out in second player game for presentation purposes
     #pygame.mixer.music.load("sounds/vamp.mp3")
     #pygame.mixer.music.play(-1)
 
@@ -255,72 +259,164 @@ def second_player_main():
     cameray = 300
 
     background = pygame.image.load("level/background.png").convert_alpha()
-    simon = Simon(0, 0)
+    simon = Simon(-1, -1)
+    ghoul = Ghoul(-1, -1)
+    bat = Bat(-1, -1)
+    is_panning_up =     False
+    is_panning_down =   False
+    is_panning_left =   False
+    is_panning_right =  False
+    camera_pan_amount = 5
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', 7777))
-    s.listen(1)
-    print "Waiting for connection now at ", str(socket.gethostbyname(socket.gethostname()))
-    connection, address = s.accept()
+    enemy_type = "Ghoul"
+
 
     while True:
         #Input Handling
+        enemy_spawn = None
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == KEYDOWN:
-                move = 30
-                if event.key == K_UP:
-                    cameray -= move
-                if event.key == K_DOWN:
-                    cameray += move
-                if event.key == K_LEFT:
-                    camerax -= move
-                if event.key == K_RIGHT:
-                    camerax += move
+                if event.key == K_w:
+                    is_panning_up = True
+                if event.key == K_s:
+                    is_panning_down = True
+                if event.key == K_a:
+                    is_panning_left = True
+                if event.key == K_d:
+                    is_panning_right = True
+
+                if event.key == K_1 or event.key == K_KP1:
+                    enemy_type = "Ghoul"
+                if event.key == K_2 or event.key == K_KP2:
+                    enemy_type = "Bat"
+
+            if event.type == KEYUP:
+                if event.key == K_w:
+                    is_panning_up = False
+                if event.key == K_s:
+                    is_panning_down = False
+                if event.key == K_a:
+                    is_panning_left = False
+                if event.key == K_d:
+                    is_panning_right = False
+
+            if event.type == MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                xpos = mousex + camerax
+                ypos = mousey + cameray
+                enemy_spawn = (xpos, ypos, enemy_type)
+                print enemy_spawn
+        
+        if is_panning_up:
+            cameray -= camera_pan_amount
+        if is_panning_down:
+            cameray += camera_pan_amount
+        if is_panning_left:
+            camerax -= camera_pan_amount
+        if is_panning_right:
+            camerax += camera_pan_amount
 
         camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(background, (-camerax, -cameray))
 
-        
-        simon_rect = recieve_actor_positions(connection)
+        world_report = receive_world_report(connection)
+        send_spawn_input(enemy_spawn, connection)
+
+        if world_report == None:
+            print "Connection to Player 1 has Failed"
+        else:
+            simon_rect = world_report["Simon"]
+            simon_health = world_report["Health"]
+            monster_points = world_report["MP"]
+            timeleft = world_report["Time"]
+            enemies = world_report["Enemies"]
+
+
+
         if camera.colliderect(simon_rect):
-                screen.blit(simon.image, (simon_rect.x-camera.x-simon.hitboxoffset, simon_rect.y-camera.y))
+            simonx = simon_rect.x - camera.x - simon.hitboxoffset
+            simony = simon_rect.y - camera.y
+            screen.blit(simon.image, (simonx, simony))
+
+        for enemy in enemies:
+            enemy_rect = enemy[1]
+            enemy_t = enemy[0]
+            if camera.colliderect(enemy_rect):
+                enemyx = enemy_rect.x - camera.x
+                enemyy = enemy_rect.y - camera.y
+                if enemy_t == "Ghoul":
+                    screen.blit(ghoul.image, (enemyx, enemyy))
+                elif enemy_t == "Bat":
+                    screen.blit(bat.image, (enemyx, enemyy))
+
+        label = "Simon Health: " + str(simon_health)
+        label = font.render(label, 1, (255,255,255))
+        screen.blit(label, (10, 10)) 
+
+        label = "Time: " + str(timeleft)
+        label = font.render(label, 1, (255,255,255))
+        screen.blit(label, (10, 60)) 
+
+        label = enemy_type + ": "
+        if enemy_type == "Ghoul":
+            label += str(Ghoul.cost)
+        elif enemy_type == "Bat":
+            label += str(Bat.cost)
+        label = font.render(label, 1, (255,255,255))
+        screen.blit(label, (10, 110)) 
+
+        label = "MP: " + str(monster_points)
+        label = font.render(label, 1, (255,255,255))
+        screen.blit(label, (10, 160)) 
 
 
-
-        '''
-        for sprite in world.all_sprites:
-            if camera.colliderect(sprite.rect):
-                screen.blit(sprite.image,
-                           (sprite.rect.x-camera.x-sprite.hitboxoffset,
-                            sprite.rect.y-camera.y))
-        '''
 
         pygame.display.flip()
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
 
     connection.close()
-    pass
 
-def send_actor_positions(world, socket):
-    """send the positions of all actors to player 2"""
+def send_world_report(world, socket):
+    """send the pertinent world information to the second player"""
+    world_report = {
+        "Simon": world.simon.rect,
+        "Health": world.simon.health,
+        "MP": world.mp,
+        "Time": world.time,
+        "Enemies": []
+    }
 
-    actor_positions = [("S", world.simon.rect)]
     for enemy in world.enemies:
-        pass
-    pickledinfo = pickle.dumps(actor_positions)
-    socket.sendall(pickledinfo)
+        enemy_summary = (enemy.__name__, enemy.rect)
+        world_report["Enemies"].append(enemy_summary)
+    
+    socket.sendall(pickle.dumps(world_report))
 
-def recieve_actor_positions(connection):
+def receive_world_report(connection):
+    """receive the pertinent world informtion from the first player"""
     data = connection.recv(1024)
     if not data:
         return None
     else:
         return pickle.loads(str(data))
+
+def receive_spawn_input(connection):
+    """recieve possible spawn inputs from the second player"""
+    data = connection.recv(1024)
+    if not data:
+        return None
+    else:
+        return pickle.loads(str(data))
+
+def send_spawn_input(enemy_spawn_summary, socket):
+    """send spawn inputs to the first player"""
+    socket.sendall(pickle.dumps(enemy_spawn_summary))
 
 
 class World(object):
@@ -374,13 +470,13 @@ class World(object):
             if self.mp < self.mp_max:
                 self.mp += self.mp_regen
 
-        if self.time is 0:
-            self.simon.die()
+        if self.time == 0:
+            self.p2win()
 
 
         self.simon.update(inputs, self)
         if self.simon.rect.colliderect(self.death):
-            self.simon.die()
+            self.p2win()
         if self.simon.rect.colliderect(self.goal):
             self.p1win()
 
@@ -393,11 +489,9 @@ class World(object):
             box = self.simon.rect
             if (box.colliderect(enemy)):
                 if box.x < enemy.rect.x:
-                    self.simon.recieve_hit("Right")
+                    self.simon.receive_hit("Right")
                 else:
-                    self.simon.recieve_hit("Left")
-                    
-
+                    self.simon.receive_hit("Left")
 
     def generate_mask_boxes(self, imagemask):
         """Returns a list of rectangle objects based on image mask"""
@@ -408,11 +502,11 @@ class World(object):
 
     def create_enemy(self, xpos, ypos, type="Bat"):
         """create an enemy in the game world"""
-        if type is "Ghoul" and self.mp >= Ghoul.cost:
+        if type == "Ghoul" and self.mp >= Ghoul.cost:
             self.mp -= Ghoul.cost
             self.enemies.append(Ghoul(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
-        elif type is "Bat" and self.mp >= Bat.cost:
+        elif type == "Bat" and self.mp >= Bat.cost:
             self.mp -= Bat.cost
             self.enemies.append(Bat(xpos, ypos))
             self.all_sprites.append(self.enemies[-1])
@@ -466,6 +560,7 @@ class Bat(Actor):
         self.velocity = 0
         self.xvector = 0
         self.yvector = 0
+        self.__name__ = "Bat"
 
     def update(self, world):
         """enemy AI processing"""
@@ -509,11 +604,11 @@ class Bat(Actor):
             self.frame = FPS
 
         f = self.frame / 10
-        if f is 1 or f is 4:
+        if f == 1 or f == 4:
             self.image = self.image1
-        elif f is 2 or f is 5:
+        elif f == 2 or f == 5:
             self.image = self.image2
-        elif f is 3:
+        elif f == 3:
             self.image = self.image3
 
         if self.movx < 0:
@@ -521,7 +616,7 @@ class Bat(Actor):
         elif self.movx > 0:
             self.direction = "Right"
 
-        if self.direction is "Right":
+        if self.direction == "Right":
             self.image = pygame.transform.flip(self.image, True, False)
 
 class Ghoul(Actor):
@@ -538,6 +633,7 @@ class Ghoul(Actor):
         self.is_grounded = False
         self.is_vector_set = False
         self.xvector = 0
+        self.__name__ = "Ghoul"
 
         self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
@@ -578,7 +674,7 @@ class Ghoul(Actor):
             self.frame = FPS
 
         f = self.frame / 15
-        if f is 1 or f is 3:
+        if f == 1 or f == 3:
             self.image = self.image1
         else:
             self.image = self.image2
@@ -588,15 +684,8 @@ class Ghoul(Actor):
         elif self.movx > 0:
             self.direction = "Right"
 
-        if self.direction is "Right":
+        if self.direction == "Right":
             self.image = pygame.transform.flip(self.image, True, False)
-
-
-
-    def recieve_hit(self):
-        """actions to take when hit by player1's attack"""
-        pass
-        
 
 class Simon(Actor):
 
@@ -649,10 +738,10 @@ class Simon(Actor):
         pygame.quit()
         sys.exit()
 
-    def recieve_hit(self, enemyrelpos):
+    def receive_hit(self, enemyrelpos):
         if not self.invul:
             self.health -= 1
-            if self.health is 0:
+            if self.health == 0:
                 self.die()
             self.invul = True
             self.invul_frame = 0
@@ -668,7 +757,7 @@ class Simon(Actor):
                 self.is_big_toss = True
                 self.is_jumping = True
                 self.velocity = self.jump_velocity
-                if enemyrelpos is "Left":
+                if enemyrelpos == "Left":
                     self.right_jump = True
                 else:
                     self.left_jump = True
@@ -682,7 +771,7 @@ class Simon(Actor):
         self.movy = 0
         self.image = self.spritesheet["stand.png"]
 
-        if self.invul is False:
+        if self.invul == False:
             pass
         elif self.invul_frame < self.max_invul_frames:
             self.invul_frame += 1
@@ -695,7 +784,7 @@ class Simon(Actor):
         if self.is_big_toss:
             self.velocity -= self.jump_decay
         elif self.is_jumping:
-            if self.inputs["b"] and self.is_attacking is False:
+            if self.inputs["b"] and self.is_attacking == False:
                 self.is_attacking = True
                 self.attack_frame = 1
             self.velocity -= self.jump_decay
@@ -724,7 +813,7 @@ class Simon(Actor):
                     self.direction = "Right"
                     if self.rect.y > world.bot_stairs[self.climb_index][1]:
                         self.is_climbing = False
-            if self.inputs["b"] and self.is_attacking is False:
+            if self.inputs["b"] and self.is_attacking == False:
                 self.is_attacking = True
                 self.attack_frame = 1
 
@@ -781,7 +870,7 @@ class Simon(Actor):
 
 
         #Character action definitions
-        if self.is_climbing is False:
+        if self.is_climbing == False:
             foot = self.rect.y + self.rect.height + 4
             for box in world.obstacles:
                 if box.collidepoint(self.rect.x, foot) == False:
@@ -825,26 +914,26 @@ class Simon(Actor):
             self.rect.x = newx
 
        #Sprite processing
-        if self.is_jumping is False:
-            if self.movx is 0:
+        if self.is_jumping == False:
+            if self.movx == 0:
                 self.is_standing = True
             else:
                 self.is_standing = False
         else:
             self.image = self.spritesheet["jump.png"]
 
-        if self.is_standing is False and self.is_jumping is False:
-            if self.movx is not 0:
+        if self.is_standing == False and self.is_jumping == False:
+            if self.movx != 0:
                 
                 f = world.frame / 15
-                if f is 1 or f is 3:
+                if f == 1 or f == 3:
                     self.image = self.spritesheet["walk1.png"]
                 else:
                     self.image = self.spritesheet["walk2.png"]
 
         if self.is_climbing:
             f = world.frame / 15
-            if f is 1 or f is 3:
+            if f == 1 or f == 3:
                 self.image = self.spritesheet["stairs1.png"]
             else:
                 self.image = self.spritesheet["stairs2.png"]
@@ -857,8 +946,8 @@ class Simon(Actor):
                 self.image = self.spritesheet["stairsattack" + str(f) +".png"]
             else:
                 self.image = self.spritesheet["attack" + str(f) + ".png"]
-            if f is 3:
-                if self.direction is "Left":
+            if f == 3:
+                if self.direction == "Left":
                     self.attack = Rect((self.rect.x - 60, self.rect.y + 20), 
                             (self.attack_size))
                 else:
@@ -880,7 +969,7 @@ class Simon(Actor):
         elif self.movx > 0:
             self.direction = "Right"
 
-        if self.direction is "Right":
+        if self.direction == "Right":
             self.image = pygame.transform.flip(self.image, True, False)
 
 
