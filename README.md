@@ -9,6 +9,8 @@ Tested on:
 - [Python](http://www.python.org/) 2.7.5
 - [Pygame](http://www.pygame.org/) 1.9.1
 
+For those on Linux, both of these packages can most likely be found in your distro's default repositories.
+
 Player 1 Controls:
 ==================
 
