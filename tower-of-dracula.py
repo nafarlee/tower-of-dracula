@@ -595,7 +595,7 @@ class Actor(pygame.sprite.Sprite):
 class Bat(Actor):
     """Class the represents bats in the game world."""
 
-    cost = 60
+    cost = 50
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
@@ -675,7 +675,7 @@ class Bat(Actor):
 class Ghoul(Actor):
     """Class that represents Ghouls in the game world"""
 
-    cost = 20
+    cost = 10
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
