@@ -487,9 +487,9 @@ class World(object):
         self.time = self.time_limit
         self.winner = 0
 
-        self.mp_max = 70
+        self.mp_max = 100
         self.mp = self.mp_max
-        self.mp_regen = 10
+        self.mp_regen = 5
 
         self.stair_width = 100
         self.stair_height = 40
@@ -595,7 +595,7 @@ class Actor(pygame.sprite.Sprite):
 class Bat(Actor):
     """Class the represents bats in the game world."""
 
-    cost = 40
+    cost = 60
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
@@ -750,7 +750,7 @@ class Simon(Actor):
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
         self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
-        self.maxhealth = 9
+        self.maxhealth = 7
         self.health = self.maxhealth
 
         self.is_jumping = False
@@ -1018,6 +1018,9 @@ class Simon(Actor):
 
         if self.direction == "Right":
             self.image = pygame.transform.flip(self.image, True, False)
+
+        if self.invul_frame % 2 == 0:
+            self.image = self.spritesheet["flash.png"]
 
 
 if __name__ == "__main__":
