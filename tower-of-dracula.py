@@ -487,7 +487,7 @@ class World(object):
         self.time = self.time_limit
         self.winner = 0
 
-        self.mp_max = 100
+        self.mp_max = 60
         self.mp = self.mp_max
         self.mp_regen = 5
 
