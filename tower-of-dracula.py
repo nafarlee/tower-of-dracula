@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 """Castlevania Tower Defense Game"""
 
-__author__ = 'Nicholas Farley'
+import sys
+import os
+import socket
+import cPickle as pickle
 
-import sys, os, socket, cPickle as pickle
 import pygame
+
+__author__ = 'Nicholas Farley'
 
 BG_COLOR = pygame.Color('#271b8f')
 FPS = 60
@@ -12,7 +16,7 @@ FPS = 60
 WINDOW_WIDTH = int(raw_input("Enter desired window width: "))
 assert WINDOW_WIDTH >= 640, "Window == gonna be too short"
 
-WINDOW_HEIGHT = int(raw_input("Enter desired window height: " ))
+WINDOW_HEIGHT = int(raw_input("Enter desired window height: "))
 assert WINDOW_HEIGHT >= 480, "Window == gonna be too thin"
 
 
@@ -34,10 +38,7 @@ def first_player_main():
     """Play the game as Simon, with or without multiplayer"""
     network_type = raw_input("Play multiplayer? y/n ")
 
-    if network_type == 'y':
-        is_multiplayer = True
-    else:
-        is_multiplayer = False
+    is_multiplayer = bool(network_type == 'y')
 
     if is_multiplayer:
         server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
@@ -61,12 +62,12 @@ def first_player_main():
     fpsclock = pygame.time.Clock()
 
     inputs = {
-            "up":       False, 
-            "down":     False,
-            "left":     False, 
-            "right":    False, 
-            "a":        False, 
-            "b":        False
+        "up": False,
+        "down": False,
+        "left": False,
+        "right": False,
+        "a": False,
+        "b": False
     }
     camerax = 600
     cameray = 300
@@ -77,7 +78,7 @@ def first_player_main():
     enemy_type = "Ghoul"
 
     world = World(playerx, playery)
-    
+
     #Game Loop
     while True:
         #Input Handling
@@ -160,52 +161,53 @@ def first_player_main():
         for sprite in world.all_sprites:
             if camera.colliderect(sprite.rect):
                 screen.blit(sprite.image,
-                           (sprite.rect.x-camera.x-sprite.hitboxoffset,
-                            sprite.rect.y-camera.y))
+                            (sprite.rect.x-camera.x-sprite.hitboxoffset,
+                             sprite.rect.y-camera.y))
 
-        if debugging_masks == True:
+        if debugging_masks:
             box = world.goal
-            pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
-                    box.y-camera.y, box.width, box.height))
+            pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x,
+                                                   box.y-camera.y,
+                                                   box.width, box.height))
 
             if world.simon.is_attacking:
                 box = world.simon.attack
-                pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x, 
-                                 box.y-camera.y, box.width, box.height))
+                pygame.draw.rect(screen, (255, 0, 0), (box.x-camera.x,
+                                                       box.y-camera.y, box.width, box.height))
 
             for box in world.obstacles:
                 if box.colliderect(camera):
-                    pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x, 
-                                     box.y-camera.y, box.width, box.height))
+                    pygame.draw.rect(screen, (0, 255, 0), (box.x-camera.x,
+                                                           box.y-camera.y, box.width, box.height))
 
             for steps in world.top_stairs:
                 box = pygame.Rect((steps[0] - world.stair_width/2, steps[1]),
-                           (world.stair_width, world.stair_height))
+                                  (world.stair_width, world.stair_height))
                 if box.colliderect(camera):
-                    pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
-                                     box.y-camera.y, box.width, box.height))
+                    pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x,
+                                                           box.y-camera.y, box.width, box.height))
 
             for steps in world.bot_stairs:
                 box = pygame.Rect((steps[0] - world.stair_width/2, steps[1]),
-                           (world.stair_width, world.stair_height))
+                                  (world.stair_width, world.stair_height))
 
                 if box.colliderect(camera):
-                    pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
-                                     box.y-camera.y, box.width, box.height))
+                    pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x,
+                                                           box.y-camera.y, box.width, box.height))
 
             for enemy in world.enemies:
                 box = enemy.rect
                 if box.colliderect(camera):
-                    pygame.draw.rect(screen, (0, 255, 255), (box.x-camera.x, 
-                                     box.y-camera.y, box.width, box.height))
+                    pygame.draw.rect(screen, (0, 255, 255), (box.x-camera.x,
+                                                             box.y-camera.y, box.width, box.height))
 
         #HUD
         label = "Health: " + str(world.simon.health) + "/" + str(world.simon.maxhealth)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 10)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, 10))
         label = "Time: " + str(world.time)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 60)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, 60))
 
         if not is_multiplayer:
             label = enemy_type + ": "
@@ -213,12 +215,12 @@ def first_player_main():
                 label += str(Ghoul.cost)
             elif enemy_type == "Bat":
                 label += str(Bat.cost)
-            label = font.render(label, 1, (255,255,255))
-            screen.blit(label, (10, 110)) 
+            label = font.render(label, 1, (255, 255, 255))
+            screen.blit(label, (10, 110))
 
             label = "MP: " + str(world.mp)
-            label = font.render(label, 1, (255,255,255))
-            screen.blit(label, (10, 160)) 
+            label = font.render(label, 1, (255, 255, 255))
+            screen.blit(label, (10, 160))
         #END DRAWING PROCEDURES
 
 
@@ -231,7 +233,7 @@ def first_player_main():
                 enemyy = enemy_spawn[1]
                 enemytype = enemy_spawn[2]
                 world.create_enemy(enemyx, enemyy, enemytype)
-            
+
         if world.winner == 1:
             youwin(screen, client_socket)
         elif world.winner == 2:
@@ -250,7 +252,7 @@ def second_player_main():
     s.bind(('', listen_port))
     s.listen(1)
     print "Waiting for connection now at", str(socket.gethostbyname(socket.gethostname()))
-    connection, address = s.accept()
+    connection = s.accept()[0]
 
     #init
     pygame.init()
@@ -272,10 +274,10 @@ def second_player_main():
     ghoul = Ghoul(-1, -1)
     bat = Bat(-1, -1)
 
-    is_panning_up =     False
-    is_panning_down =   False
-    is_panning_left =   False
-    is_panning_right =  False
+    is_panning_up = False
+    is_panning_down = False
+    is_panning_left = False
+    is_panning_right = False
     camera_pan_amount = 5
 
     enemy_type = "Ghoul"
@@ -320,7 +322,7 @@ def second_player_main():
                 xpos = mousex + camerax
                 ypos = mousey + cameray
                 enemy_spawn = (xpos, ypos, enemy_type)
-        
+
         if is_panning_up:
             cameray -= camera_pan_amount
         if is_panning_down:
@@ -337,7 +339,7 @@ def second_player_main():
         world_report = receive_world_report(connection)
         send_spawn_input(enemy_spawn, connection)
 
-        if world_report == None:
+        if world_report is None:
             print "Connection to Player 1 has Failed"
         else:
             simon_rect = world_report["Simon"]
@@ -368,28 +370,28 @@ def second_player_main():
                     screen.blit(bat.image, (enemyx, enemyy))
 
         label = "Simon Health: " + str(simon_health)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 10)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, 10))
 
         label = "Time: " + str(timeleft)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, 60)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, 60))
 
         label = enemy_type + ": "
         if enemy_type == "Ghoul":
             label += str(Ghoul.cost)
         elif enemy_type == "Bat":
             label += str(Bat.cost)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, WINDOW_HEIGHT-50)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, WINDOW_HEIGHT-50))
 
         label = "MP: " + str(monster_points)
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, WINDOW_HEIGHT-100)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, WINDOW_HEIGHT-100))
 
         label = "[1] Ghoul | Bat [2]"
-        label = font.render(label, 1, (255,255,255))
-        screen.blit(label, (10, WINDOW_HEIGHT-150)) 
+        label = font.render(label, 1, (255, 255, 255))
+        screen.blit(label, (10, WINDOW_HEIGHT-150))
 
         pygame.display.flip()
         fpsclock.tick(FPS)
@@ -409,7 +411,7 @@ def send_world_report(world, socket):
     for enemy in world.enemies:
         enemy_summary = (enemy.__name__, enemy.rect)
         world_report["Enemies"].append(enemy_summary)
-    
+
     socket.sendall(pickle.dumps(world_report))
 
 def receive_world_report(connection):
@@ -437,11 +439,11 @@ def youwin(screen, socket):
     font = pygame.font.SysFont(None, font_size)
 
     label = "YOU WIN!"
-    label = font.render(label, 1, (255,255,255))
+    label = font.render(label, 1, (255, 255, 255))
     labelx = WINDOW_WIDTH/3 - font_size
     labely = WINDOW_HEIGHT/2
 
-    screen.blit(label, (labelx, labely)) 
+    screen.blit(label, (labelx, labely))
     pygame.display.flip()
 
     pygame.time.delay(4000)
@@ -454,11 +456,11 @@ def youlose(screen, socket):
     font = pygame.font.SysFont(None, font_size)
 
     label = "YOU LOSE!"
-    label = font.render(label, 1, (255,255,255))
+    label = font.render(label, 1, (255, 255, 255))
     labelx = WINDOW_WIDTH/3 - font_size
     labely = WINDOW_HEIGHT/2
 
-    screen.blit(label, (labelx, labely)) 
+    screen.blit(label, (labelx, labely))
     pygame.display.flip()
 
     pygame.time.delay(4000)
@@ -472,9 +474,8 @@ class World(object):
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
         self.obstacles = self.generate_mask_boxes("level/backgroundmask.png")
-        self.background = (pygame.image.load
-                ("level/background.png").convert_alpha())
-        self.death  = self.generate_mask_boxes("level/backgrounddeath.png")
+        self.background = pygame.image.load("level/background.png").convert_alpha()
+        self.death = self.generate_mask_boxes("level/backgrounddeath.png")
         self.death = self.death[0]
         self.goal = pygame.Rect(6960, 190, 75, 75)
         self.enemies = []
@@ -493,26 +494,26 @@ class World(object):
         self.stair_width = 100
         self.stair_height = 40
         self.bot_stairs = [
-                (320, 808),
-                (94, 582),
-                (752, 584),
-                (1275,582),
-                (2660, 520),
-                (2799, 390),
+            (320, 808),
+            (94, 582),
+            (752, 584),
+            (1275, 582),
+            (2660, 520),
+            (2799, 390),
         ]
         self.top_stairs = [
-                (94, 582),
-                (235, 440),
-                (814,520),
-                (1137, 454),
-                (2799, 390),
-                (2567, 164),
+            (94, 582),
+            (235, 440),
+            (814, 520),
+            (1137, 454),
+            (2799, 390),
+            (2567, 164),
         ]
 
     def update(self, inputs):
         """call all world processing routines"""
         if self.frame < FPS:
-            self.frame  += 1
+            self.frame += 1
         else:
             self.frame = 0
             self.time -= 1
@@ -537,7 +538,7 @@ class World(object):
                 if box.colliderect(enemy.rect):
                     self.destroy_actor(i)
             box = self.simon.rect
-            if (box.colliderect(enemy)):
+            if box.colliderect(enemy):
                 if box.x < enemy.rect.x:
                     self.simon.receive_hit("Right")
                 else:
@@ -553,7 +554,7 @@ class World(object):
     def create_enemy(self, xpos, ypos, type="Bat"):
         """create an enemy in the game world"""
         unspawnable_box = self.simon.rect.inflate(300, 300)
-        if unspawnable_box.collidepoint(xpos, ypos) == False:
+        if not unspawnable_box.collidepoint(xpos, ypos):
             if type == "Ghoul" and self.mp >= Ghoul.cost:
                 self.mp -= Ghoul.cost
                 self.enemies.append(Ghoul(xpos, ypos))
@@ -562,7 +563,7 @@ class World(object):
                 self.mp -= Bat.cost
                 self.enemies.append(Bat(xpos, ypos))
                 self.all_sprites.append(self.enemies[-1])
-        
+
     def destroy_actor(self, index):
         """removes an enemy in the game world"""
         del self.enemies[index]
@@ -643,7 +644,7 @@ class Bat(Actor):
         if self.yvector <= self.rect.y:
             self.yvector -= 5
             self.movy -= self.velocity
-        elif self.yvector > self.rect.y: 
+        elif self.yvector > self.rect.y:
             self.movy += self.velocity
 
         self.rect.x += self.movx
@@ -652,7 +653,7 @@ class Bat(Actor):
 
         if self.frame > 0:
             self.frame -= 1
-        else: 
+        else:
             self.frame = FPS
 
         f = self.frame / 10
@@ -707,8 +708,8 @@ class Ghoul(Actor):
 
             newx = self.rect.x + self.movx
             for box in world.obstacles:
-                if box.colliderect(newx, self.rect.y, self.rect.width, 
-                        self.rect.height):
+                if box.colliderect(newx, self.rect.y, self.rect.width,
+                                   self.rect.height):
                     self.xvector *= -1
         else:
             self.movy += world.gravity
@@ -766,7 +767,7 @@ class Simon(Actor):
 
         self.inputs = []
 
-        self.attack = pygame.Rect(0,0,0,0)
+        self.attack = pygame.Rect(0, 0, 0, 0)
         self.attack_frame = -1
         self.attack_size = (50, 15)
 
@@ -783,7 +784,7 @@ class Simon(Actor):
         for files in os.listdir("."):
             if files.endswith(".png"):
                 self.spritesheet[files] = (pygame.image.load
-                        (files).convert_alpha())
+                                           (files).convert_alpha())
         os.chdir("..")
 
     def receive_hit(self, enemyrelpos):
@@ -795,7 +796,7 @@ class Simon(Actor):
             if not self.is_climbing:
                 self.attack_frame = -1
                 self.is_attacking = False
-                self.attack = pygame.Rect(0,0,0,0)
+                self.attack = pygame.Rect(0, 0, 0, 0)
                 self.left_jump = False
                 self.right_jump = False
 
@@ -803,12 +804,7 @@ class Simon(Actor):
                 self.is_big_toss = True
                 self.is_jumping = True
                 self.velocity = self.jump_velocity
-                if enemyrelpos == "Left":
-                    self.right_jump = True
-                else:
-                    self.left_jump = True
-
-            
+                self.right_jump = bool(enemyrelpos == "Left")
 
     def update(self, inputs, world):
         """update the state of Simon based on inputs and previous state"""
@@ -817,7 +813,7 @@ class Simon(Actor):
         self.movy = 0
         self.image = self.spritesheet["stand.png"]
 
-        if self.invul == False:
+        if not self.invul:
             pass
         elif self.invul_frame < self.max_invul_frames:
             self.invul_frame += 1
@@ -825,12 +821,12 @@ class Simon(Actor):
             self.invul_frame = -1
             self.invul = False
 
-        
+
         #Check valid input based on state
         if self.is_big_toss:
             self.velocity -= self.jump_decay
         elif self.is_jumping:
-            if self.inputs["b"] and self.is_attacking == False:
+            if self.inputs["b"] and not self.is_attacking:
                 self.is_attacking = True
                 self.attack_frame = 1
             self.velocity -= self.jump_decay
@@ -859,14 +855,13 @@ class Simon(Actor):
                     self.direction = "Right"
                     if self.rect.y > world.bot_stairs[self.climb_index][1]:
                         self.is_climbing = False
-            if self.inputs["b"] and self.is_attacking == False:
+            if self.inputs["b"] and not self.is_attacking:
                 self.is_attacking = True
                 self.attack_frame = 1
 
         #Disallow movement if falling
         elif self.is_falling:
             self.image = self.spritesheet["jump.png"]
-            pass
         else:
             if self.is_attacking:
                 pass
@@ -891,11 +886,11 @@ class Simon(Actor):
                     #Stair Mounting
                     elif self.inputs["up"]:
                         for i, step in enumerate(world.bot_stairs):
-                            hook = pygame.Rect( (step[0] - world.stair_width/2,
-                                step[1]), (world.stair_width,
-                                    world.stair_height))
+                            hook = pygame.Rect((step[0] - world.stair_width/2,
+                                                step[1]), (world.stair_width,
+                                                           world.stair_height))
                             player = pygame.Rect(self.rect.x, self.rect.y,
-                                          self.rect.width, self.rect.height)
+                                                 self.rect.width, self.rect.height)
 
                             if hook.colliderect(player):
                                 self.is_climbing = True
@@ -903,11 +898,11 @@ class Simon(Actor):
                                 self.rect.x = step[0]
                     elif self.inputs["down"]:
                         for i, step in enumerate(world.top_stairs):
-                            hook = pygame.Rect( (step[0] - world.stair_width/2,
-                                step[1]), (world.stair_width,
-                                    world.stair_height))
+                            hook = pygame.Rect((step[0] - world.stair_width/2,
+                                                step[1]), (world.stair_width,
+                                                              world.stair_height))
                             player = pygame.Rect(self.rect.x, self.rect.y,
-                                          self.rect.width, self.rect.height)
+                                                 self.rect.width, self.rect.height)
 
                             if hook.colliderect(player):
                                 self.is_climbing = True
@@ -916,10 +911,10 @@ class Simon(Actor):
 
 
         #Character action definitions
-        if self.is_climbing == False:
+        if not self.is_climbing:
             foot = self.rect.y + self.rect.height + 4
             for box in world.obstacles:
-                if box.collidepoint(self.rect.x, foot) == False:
+                if not box.collidepoint(self.rect.x, foot):
                     self.is_falling = True
 
             if self.left_jump:
@@ -930,12 +925,12 @@ class Simon(Actor):
             self.movy -= self.velocity
             self.movy += world.gravity
 
-            
+
             #Gravity and collission handling
-            for box in (world.obstacles):
+            for box in world.obstacles:
                 if self.rect.colliderect(box):
                     self.rect.y = box.y - self.rect.height
-                    self.velocity = 0
+                    self.velocity = 0.0
                     self.is_falling = False
                     self.is_jumping = False
                     self.left_jump = False
@@ -943,34 +938,31 @@ class Simon(Actor):
                     self.is_big_toss = False
 
                 for box in world.obstacles:
-                    if box.colliderect(self.rect.x, self.rect.y+self.movy, 
-                                    self.rect.width, self.rect.height/10):
+                    if box.colliderect(self.rect.x, self.rect.y+self.movy,
+                                       self.rect.width, self.rect.height/10):
                         self.movy += self.rect.height/10
-                        self.velocity = 0
+                        self.velocity = 0.0
                         self.is_falling = True
 
             self.rect.y += self.movy
 
             newx = self.rect.x + self.movx
-        
+
             for box in world.obstacles:
-                if box.colliderect(newx, self.rect.y-world.gravity, 
-                        self.rect.width, self.rect.height):
+                if box.colliderect(newx, self.rect.y-world.gravity,
+                                   self.rect.width, self.rect.height):
                     newx = self.rect.x
             self.rect.x = newx
 
        #Sprite processing
-        if self.is_jumping == False:
-            if self.movx == 0:
-                self.is_standing = True
-            else:
-                self.is_standing = False
+        if not self.is_jumping:
+            self.is_standing = bool(self.movx == 0)
         else:
             self.image = self.spritesheet["jump.png"]
 
-        if self.is_standing == False and self.is_jumping == False:
+        if not self.is_standing and not self.is_jumping:
             if self.movx != 0:
-                
+
                 f = world.frame / 15
                 if f == 1 or f == 3:
                     self.image = self.spritesheet["walk1.png"]
@@ -995,16 +987,16 @@ class Simon(Actor):
             if f == 3:
                 if self.direction == "Left":
                     self.attack = pygame.Rect((self.rect.x - 60, self.rect.y + 20),
-                            (self.attack_size))
+                                              (self.attack_size))
                 else:
                     self.attack = pygame.Rect((self.rect.x + self.rect.width + 10,
-                            self.rect.y + 20), (self.attack_size))
+                                               self.rect.y + 20), (self.attack_size))
             if self.attack_frame < 29:
                 self.attack_frame += 1
             else:
                 self.attack_frame = -1
                 self.is_attacking = False
-                self.attack = pygame.Rect(0,0,0,0)
+                self.attack = pygame.Rect(0, 0, 0, 0)
 
         if self.is_big_toss:
             self.image = self.spritesheet["damage.png"]
