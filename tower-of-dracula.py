@@ -51,7 +51,7 @@ def first_player_main():
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    pygame.mixer.music.load("sounds/vamp.mp3")
+    pygame.mixer.music.load("assets/music/vamp.mp3")
     pygame.mixer.music.play(-1)
 
     if is_multiplayer:
