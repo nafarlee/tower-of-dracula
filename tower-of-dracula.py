@@ -269,7 +269,7 @@ def second_player_main():
     cameray = 300
 
     #data resources
-    background = pygame.image.load("level/background.png").convert_alpha()
+    background = pygame.image.load("assets/levels/background.png").convert_alpha()
     simon = Simon(-1, -1)
     ghoul = Ghoul(-1, -1)
     bat = Bat(-1, -1)
@@ -473,9 +473,9 @@ class World(object):
     """Class that represents the state of the game world"""
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
-        self.obstacles = self.generate_mask_boxes("level/backgroundmask.png")
-        self.background = pygame.image.load("level/background.png").convert_alpha()
-        self.death = self.generate_mask_boxes("level/backgrounddeath.png")
+        self.obstacles = self.generate_mask_boxes("assets/levels/backgroundmask.png")
+        self.background = pygame.image.load("assets/levels/background.png").convert_alpha()
+        self.death = self.generate_mask_boxes("assets/levels/backgrounddeath.png")
         self.death = self.death[0]
         self.goal = pygame.Rect(6960, 190, 75, 75)
         self.enemies = []
