@@ -742,12 +742,12 @@ class Ghoul(Actor):
 
 class Simon(Actor):
 
-    static_image = pygame.image.load("simon/stand.png")
+    static_image = pygame.image.load("assets/simon/stand.png")
     """Class that represents player 1 in the game world"""
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
 
-        self.image = pygame.image.load("simon/stand.png")
+        self.image = pygame.image.load("assets/simon/stand.png")
         self.hitboxoffset = 56
         self.rect = pygame.Rect(xpos+self.hitboxoffset, ypos, 32, 61)
         self.maxhealth = 7
@@ -780,12 +780,12 @@ class Simon(Actor):
         self.climb_index = -1
 
         self.spritesheet = {}
-        os.chdir("simon")
+        os.chdir("assets/simon")
         for files in os.listdir("."):
             if files.endswith(".png"):
                 self.spritesheet[files] = (pygame.image.load
                                            (files).convert_alpha())
-        os.chdir("..")
+        os.chdir("../..")
 
     def receive_hit(self, enemyrelpos):
         if not self.invul:
