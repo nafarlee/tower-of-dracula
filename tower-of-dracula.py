@@ -51,7 +51,7 @@ def first_player_main():
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    pygame.mixer.music.load("sounds/vamp.mp3")
+    pygame.mixer.music.load("assets/music/vamp.mp3")
     pygame.mixer.music.play(-1)
 
     if is_multiplayer:
@@ -269,7 +269,7 @@ def second_player_main():
     cameray = 300
 
     #data resources
-    background = pygame.image.load("level/background.png").convert_alpha()
+    background = pygame.image.load("assets/levels/background.png").convert_alpha()
     simon = Simon(-1, -1)
     ghoul = Ghoul(-1, -1)
     bat = Bat(-1, -1)
@@ -473,9 +473,9 @@ class World(object):
     """Class that represents the state of the game world"""
     def __init__(self, playerx, playery):
         self.simon = Simon(playerx, playery)
-        self.obstacles = self.generate_mask_boxes("level/backgroundmask.png")
-        self.background = pygame.image.load("level/background.png").convert_alpha()
-        self.death = self.generate_mask_boxes("level/backgrounddeath.png")
+        self.obstacles = self.generate_mask_boxes("assets/levels/backgroundmask.png")
+        self.background = pygame.image.load("assets/levels/background.png").convert_alpha()
+        self.death = self.generate_mask_boxes("assets/levels/backgrounddeath.png")
         self.death = self.death[0]
         self.goal = pygame.Rect(6960, 190, 75, 75)
         self.enemies = []
@@ -599,9 +599,9 @@ class Bat(Actor):
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image1 = pygame.image.load("enemy/bat1.png")
-        self.image2 = pygame.image.load("enemy/bat2.png")
-        self.image3 = pygame.image.load("enemy/bat3.png")
+        self.image1 = pygame.image.load("assets/bat/bat1.png")
+        self.image2 = pygame.image.load("assets/bat/bat2.png")
+        self.image3 = pygame.image.load("assets/bat/bat3.png")
         self.image = self.image1
 
         self.hitboxoffset = 0
@@ -679,8 +679,8 @@ class Ghoul(Actor):
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image1 = pygame.image.load("enemy/ghoul1.png")
-        self.image2 = pygame.image.load("enemy/ghoul2.png")
+        self.image1 = pygame.image.load("assets/ghoul/ghoul1.png")
+        self.image2 = pygame.image.load("assets/ghoul/ghoul2.png")
         self.image = self.image1
         self.hitboxoffset = 0
         self.is_grounded = False
@@ -742,12 +742,12 @@ class Ghoul(Actor):
 
 class Simon(Actor):
 
-    static_image = pygame.image.load("simon/stand.png")
+    static_image = pygame.image.load("assets/simon/stand.png")
     """Class that represents player 1 in the game world"""
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
 
-        self.image = pygame.image.load("simon/stand.png")
+        self.image = pygame.image.load("assets/simon/stand.png")
         self.hitboxoffset = 56
         self.rect = pygame.Rect(xpos+self.hitboxoffset, ypos, 32, 61)
         self.maxhealth = 7
@@ -780,12 +780,12 @@ class Simon(Actor):
         self.climb_index = -1
 
         self.spritesheet = {}
-        os.chdir("simon")
+        os.chdir("assets/simon")
         for files in os.listdir("."):
             if files.endswith(".png"):
                 self.spritesheet[files] = (pygame.image.load
                                            (files).convert_alpha())
-        os.chdir("..")
+        os.chdir("../..")
 
     def receive_hit(self, enemyrelpos):
         if not self.invul:
