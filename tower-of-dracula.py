@@ -599,9 +599,9 @@ class Bat(Actor):
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image1 = pygame.image.load("enemy/bat1.png")
-        self.image2 = pygame.image.load("enemy/bat2.png")
-        self.image3 = pygame.image.load("enemy/bat3.png")
+        self.image1 = pygame.image.load("assets/bat/bat1.png")
+        self.image2 = pygame.image.load("assets/bat/bat2.png")
+        self.image3 = pygame.image.load("assets/bat/bat3.png")
         self.image = self.image1
 
         self.hitboxoffset = 0
@@ -679,8 +679,8 @@ class Ghoul(Actor):
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self, xpos, ypos)
-        self.image1 = pygame.image.load("enemy/ghoul1.png")
-        self.image2 = pygame.image.load("enemy/ghoul2.png")
+        self.image1 = pygame.image.load("assets/ghoul/ghoul1.png")
+        self.image2 = pygame.image.load("assets/ghoul/ghoul2.png")
         self.image = self.image1
         self.hitboxoffset = 0
         self.is_grounded = False
