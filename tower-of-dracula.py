@@ -5,7 +5,6 @@ __author__ = 'Nicholas Farley'
 
 import sys, os, socket, cPickle as pickle
 import pygame
-from pygame.locals import *
 
 BG_COLOR = pygame.Color('#271b8f')
 FPS = 60
@@ -83,55 +82,55 @@ def first_player_main():
     while True:
         #Input Handling
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
             if not is_multiplayer:
-                if event.type == MOUSEBUTTONUP:
+                if event.type == pygame.MOUSEBUTTONUP:
                     mousex, mousey = event.pos
                     xpos = mousex + camerax
                     ypos = mousey + cameray
                     world.create_enemy(xpos, ypos, enemy_type)
 
 
-            if event.type == KEYDOWN:
-                if event.key == K_m:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
                     debugging_masks = True
-                if event.key == K_b:
+                if event.key == pygame.K_b:
                     debugging_masks = False
 
                 if not is_multiplayer:
-                    if event.key == K_1 or event.key == K_KP1:
+                    if event.key == pygame.K_1 or event.key == pygame.K_KP1:
                         enemy_type = "Ghoul"
-                    if event.key == K_2 or event.key == K_KP2:
+                    if event.key == pygame.K_2 or event.key == pygame.K_KP2:
                         enemy_type = "Bat"
 
-                if event.key == K_w:
+                if event.key == pygame.K_w:
                     inputs["up"] = True
-                if event.key == K_s:
+                if event.key == pygame.K_s:
                     inputs["down"] = True
-                if event.key == K_a:
+                if event.key == pygame.K_a:
                     inputs["left"] = True
-                if event.key == K_d:
+                if event.key == pygame.K_d:
                     inputs["right"] = True
-                if event.key == K_SPACE:
+                if event.key == pygame.K_SPACE:
                     inputs["a"] = True
-                if event.key == K_LSHIFT or event.key == K_RSHIFT:
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
                     inputs["b"] = True
 
-            if event.type == KEYUP:
-                if event.key == K_w:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_w:
                     inputs["up"] = False
-                if event.key == K_s:
+                if event.key == pygame.K_s:
                     inputs["down"] = False
-                if event.key == K_a:
+                if event.key == pygame.K_a:
                     inputs["left"] = False
-                if event.key == K_d:
+                if event.key == pygame.K_d:
                     inputs["right"] = False
-                if event.key == K_SPACE:
+                if event.key == pygame.K_SPACE:
                     inputs["a"] = False
-                if event.key == K_LSHIFT or event.key == K_RSHIFT:
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
                     inputs["b"] = False
 
         #MAIN UPDATING PROCEDURE
@@ -154,7 +153,7 @@ def first_player_main():
         elif world.simon.rect.y > bottomy:
             cameray += 5
 
-        camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
+        camera = pygame.Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(world.background, (-camerax, -cameray))
 
@@ -180,14 +179,14 @@ def first_player_main():
                                      box.y-camera.y, box.width, box.height))
 
             for steps in world.top_stairs:
-                box = Rect((steps[0] - world.stair_width/2, steps[1]), 
+                box = pygame.Rect((steps[0] - world.stair_width/2, steps[1]),
                            (world.stair_width, world.stair_height))
                 if box.colliderect(camera):
                     pygame.draw.rect(screen, (0, 0, 255), (box.x-camera.x, 
                                      box.y-camera.y, box.width, box.height))
 
             for steps in world.bot_stairs:
-                box = Rect((steps[0] - world.stair_width/2, steps[1]), 
+                box = pygame.Rect((steps[0] - world.stair_width/2, steps[1]),
                            (world.stair_width, world.stair_height))
 
                 if box.colliderect(camera):
@@ -287,33 +286,33 @@ def second_player_main():
         enemy_spawn = None
 
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            if event.type == KEYDOWN:
-                if event.key == K_w:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
                     is_panning_up = True
-                if event.key == K_s:
+                if event.key == pygame.K_s:
                     is_panning_down = True
-                if event.key == K_a:
+                if event.key == pygame.K_a:
                     is_panning_left = True
-                if event.key == K_d:
+                if event.key == pygame.K_d:
                     is_panning_right = True
 
-                if event.key == K_1 or event.key == K_KP1:
+                if event.key == pygame.K_1 or event.key == pygame.K_KP1:
                     enemy_type = "Ghoul"
-                if event.key == K_2 or event.key == K_KP2:
+                if event.key == pygame.K_2 or event.key == pygame.K_KP2:
                     enemy_type = "Bat"
 
-            if event.type == KEYUP:
-                if event.key == K_w:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_w:
                     is_panning_up = False
-                if event.key == K_s:
+                if event.key == pygame.K_s:
                     is_panning_down = False
-                if event.key == K_a:
+                if event.key == pygame.K_a:
                     is_panning_left = False
-                if event.key == K_d:
+                if event.key == pygame.K_d:
                     is_panning_right = False
 
             if event.type == MOUSEBUTTONUP:
@@ -331,7 +330,7 @@ def second_player_main():
         if is_panning_right:
             camerax += camera_pan_amount
 
-        camera = Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
+        camera = pygame.Rect(camerax, cameray, WINDOW_WIDTH, WINDOW_HEIGHT)
         screen.fill(BG_COLOR)
         screen.blit(background, (-camerax, -cameray))
 
@@ -477,7 +476,7 @@ class World(object):
                 ("level/background.png").convert_alpha())
         self.death  = self.generate_mask_boxes("level/backgrounddeath.png")
         self.death = self.death[0]
-        self.goal = Rect(6960, 190, 75, 75)
+        self.goal = pygame.Rect(6960, 190, 75, 75)
         self.enemies = []
         self.all_sprites = []
         self.all_sprites.append(self.simon)
@@ -605,7 +604,7 @@ class Bat(Actor):
         self.image = self.image1
 
         self.hitboxoffset = 0
-        self.rect = Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 50)
+        self.rect = pygame.Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 50)
         self.swoop = 120
         self.swoop_frame = self.swoop
         self.swoop_velocity = 5
@@ -688,7 +687,7 @@ class Ghoul(Actor):
         self.xvector = 0
         self.__name__ = "Ghoul"
 
-        self.rect = Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
+        self.rect = pygame.Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
     def update(self, world):
         """Enemy AI processing"""
@@ -749,7 +748,7 @@ class Simon(Actor):
 
         self.image = pygame.image.load("simon/stand.png")
         self.hitboxoffset = 56
-        self.rect = Rect(xpos+self.hitboxoffset, ypos, 32, 61)
+        self.rect = pygame.Rect(xpos+self.hitboxoffset, ypos, 32, 61)
         self.maxhealth = 7
         self.health = self.maxhealth
 
@@ -767,7 +766,7 @@ class Simon(Actor):
 
         self.inputs = []
 
-        self.attack = Rect(0,0,0,0)
+        self.attack = pygame.Rect(0,0,0,0)
         self.attack_frame = -1
         self.attack_size = (50, 15)
 
@@ -796,7 +795,7 @@ class Simon(Actor):
             if not self.is_climbing:
                 self.attack_frame = -1
                 self.is_attacking = False
-                self.attack = Rect(0,0,0,0)
+                self.attack = pygame.Rect(0,0,0,0)
                 self.left_jump = False
                 self.right_jump = False
 
@@ -892,10 +891,10 @@ class Simon(Actor):
                     #Stair Mounting
                     elif self.inputs["up"]:
                         for i, step in enumerate(world.bot_stairs):
-                            hook = Rect( (step[0] - world.stair_width/2, 
-                                step[1]), (world.stair_width, 
+                            hook = pygame.Rect( (step[0] - world.stair_width/2,
+                                step[1]), (world.stair_width,
                                     world.stair_height))
-                            player = Rect(self.rect.x, self.rect.y,
+                            player = pygame.Rect(self.rect.x, self.rect.y,
                                           self.rect.width, self.rect.height)
 
                             if hook.colliderect(player):
@@ -904,10 +903,10 @@ class Simon(Actor):
                                 self.rect.x = step[0]
                     elif self.inputs["down"]:
                         for i, step in enumerate(world.top_stairs):
-                            hook = Rect( (step[0] - world.stair_width/2, 
-                                step[1]), (world.stair_width, 
+                            hook = pygame.Rect( (step[0] - world.stair_width/2,
+                                step[1]), (world.stair_width,
                                     world.stair_height))
-                            player = Rect(self.rect.x, self.rect.y,
+                            player = pygame.Rect(self.rect.x, self.rect.y,
                                           self.rect.width, self.rect.height)
 
                             if hook.colliderect(player):
@@ -995,18 +994,18 @@ class Simon(Actor):
                 self.image = self.spritesheet["attack" + str(f) + ".png"]
             if f == 3:
                 if self.direction == "Left":
-                    self.attack = Rect((self.rect.x - 60, self.rect.y + 20), 
+                    self.attack = pygame.Rect((self.rect.x - 60, self.rect.y + 20),
                             (self.attack_size))
                 else:
-                    self.attack = Rect((self.rect.x + self.rect.width + 10, 
+                    self.attack = pygame.Rect((self.rect.x + self.rect.width + 10,
                             self.rect.y + 20), (self.attack_size))
             if self.attack_frame < 29:
                 self.attack_frame += 1
             else:
                 self.attack_frame = -1
                 self.is_attacking = False
-                self.attack = Rect(0,0,0,0)
-        
+                self.attack = pygame.Rect(0,0,0,0)
+
         if self.is_big_toss:
             self.image = self.spritesheet["damage.png"]
 
