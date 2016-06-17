@@ -8,6 +8,8 @@ import cPickle as pickle
 
 import pygame
 
+from Actor import Actor
+
 __author__ = 'Nicholas Farley'
 
 BG_COLOR = pygame.Color('#271b8f')
@@ -574,23 +576,6 @@ class World(object):
 
     def p2win(self):
         self.winner = 2
-
-class Actor(pygame.sprite.Sprite):
-    """Base class for all entities in the game world"""
-
-    def __init__(self, xpos, ypos):
-        pygame.sprite.Sprite.__init__(self)
-        self.movy = 0
-        self.movx = 0
-        self.move = 1
-        self.hitboxoffset = 0
-        self.image = None
-        self.rect = None
-        self.direction = "Left"
-        self.maxhealth = 1
-        self.health = self.maxhealth
-        self.frame = FPS
-        return
 
 class Bat(Actor):
     """Class the represents bats in the game world."""
