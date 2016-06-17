@@ -1,0 +1,17 @@
+import pygame
+
+class Actor(pygame.sprite.Sprite):
+    """Base class for all entities in the game world"""
+
+    def __init__(self, xpos, ypos):
+        pygame.sprite.Sprite.__init__(self)
+        self.movy = 0
+        self.movx = 0
+        self.move = 1
+        self.hitboxoffset = 0
+        self.image = None
+        self.rect = None
+        self.direction = "Left"
+        self.maxhealth = 1
+        self.health = self.maxhealth
+        return
