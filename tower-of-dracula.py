@@ -639,7 +639,7 @@ class Bat(Actor):
         if self.frame > 0:
             self.frame -= 1
         else:
-            self.frame = FPS
+            self.frame = self.FPS
 
         f = self.frame / 10
         if f == 1 or f == 4:
@@ -709,7 +709,7 @@ class Ghoul(Actor):
         if self.frame > 0:
             self.frame -= 1
         else:
-            self.frame = FPS
+            self.frame = self.FPS
 
         f = self.frame / 15
         if f == 1 or f == 3:
