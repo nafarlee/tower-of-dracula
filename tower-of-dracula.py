@@ -583,7 +583,7 @@ class Bat(Actor):
     cost = 35
 
     def __init__(self, xpos, ypos):
-        Actor.__init__(self, xpos, ypos)
+        Actor.__init__(self)
         self.image1 = pygame.image.load("assets/bat/bat1.png")
         self.image2 = pygame.image.load("assets/bat/bat2.png")
         self.image3 = pygame.image.load("assets/bat/bat3.png")
@@ -663,7 +663,7 @@ class Ghoul(Actor):
     cost = 10
 
     def __init__(self, xpos, ypos):
-        Actor.__init__(self, xpos, ypos)
+        Actor.__init__(self)
         self.image1 = pygame.image.load("assets/ghoul/ghoul1.png")
         self.image2 = pygame.image.load("assets/ghoul/ghoul2.png")
         self.image = self.image1
@@ -730,7 +730,7 @@ class Simon(Actor):
     static_image = pygame.image.load("assets/simon/stand.png")
     """Class that represents player 1 in the game world"""
     def __init__(self, xpos, ypos):
-        Actor.__init__(self, xpos, ypos)
+        Actor.__init__(self)
 
         self.image = pygame.image.load("assets/simon/stand.png")
         self.hitboxoffset = 56

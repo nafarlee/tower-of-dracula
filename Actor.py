@@ -3,7 +3,7 @@ import pygame
 class Actor(pygame.sprite.Sprite):
     """Base class for all entities in the game world"""
 
-    def __init__(self, xpos, ypos):
+    def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.movy = 0
         self.movx = 0
