@@ -1,6 +1,6 @@
 import json
 
-def get():
+def load():
     filename = "config.json"
     file_object = open(filename, "r")
     file_contents = file_object.read()
