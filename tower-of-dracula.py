@@ -470,6 +470,15 @@ def youlose(screen, socket):
     pygame.quit()
     sys.exit()
 
+def blit_large_label(screen, message):
+    font_size = 100
+    labelx = WINDOW_WIDTH/3 - font_size
+    labely = WINDOW_HEIGHT/2
+    font = pygame.font.SysFont(None, font_size)
+    label = font.render(message, 1, (255, 255, 255))
+
+    screen.blit(label, (labelx, labely))
+
 if __name__ == "__main__":
     player_type = choose_player_type()
     if player_type == "first":
