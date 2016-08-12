@@ -437,15 +437,7 @@ def receive_spawn_input(connection):
         return pickle.loads(str(data))
 
 def youwin(screen, socket):
-    font_size = 100
-    font = pygame.font.SysFont(None, font_size)
-
-    label = "YOU WIN!"
-    label = font.render(label, 1, (255, 255, 255))
-    labelx = WINDOW_WIDTH/3 - font_size
-    labely = WINDOW_HEIGHT/2
-
-    screen.blit(label, (labelx, labely))
+    blit_large_label(screen, "You Win!")
     pygame.display.flip()
 
     pygame.time.delay(4000)
@@ -454,15 +446,7 @@ def youwin(screen, socket):
     sys.exit()
 
 def youlose(screen, socket):
-    font_size = 100
-    font = pygame.font.SysFont(None, font_size)
-
-    label = "YOU LOSE!"
-    label = font.render(label, 1, (255, 255, 255))
-    labelx = WINDOW_WIDTH/3 - font_size
-    labely = WINDOW_HEIGHT/2
-
-    screen.blit(label, (labelx, labely))
+    blit_large_label(screen, "You Lose!")
     pygame.display.flip()
 
     pygame.time.delay(4000)
