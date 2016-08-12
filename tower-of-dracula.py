@@ -29,14 +29,12 @@ def choose_player_type():
     player_type = raw_input("Would you like to play as Simon or Dracula? ").lower()
 
     if player_type[0] == 's':
-        first_player_main()
-
+        return "first"
     elif player_type[0] == 'd':
-        second_player_main()
-
+        return "second"
     else:
         print "invalid choice"
-        choose_player_type()
+        return choose_player_type()
 
 def first_player_main():
     """Play the game as Simon, with or without multiplayer"""
@@ -473,4 +471,8 @@ def youlose(screen, socket):
     sys.exit()
 
 if __name__ == "__main__":
-    choose_player_type()
+    player_type = choose_player_type()
+    if player_type == "first":
+        first_player_main()
+    elif player_type == "second":
+        second_player_main()
