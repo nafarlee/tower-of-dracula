@@ -7,6 +7,7 @@ import cPickle as pickle
 
 import pygame
 
+import network
 from World import World
 from Simon import Simon
 from Bat import Bat
@@ -228,8 +229,8 @@ def first_player_main():
 
         #NETWORK INTERACTIONS
         if is_multiplayer:
-            send_world_report(world, client_socket)
-            enemy_spawn = receive_spawn_input(client_socket)
+            network.send_world_report(world, client_socket)
+            enemy_spawn = network.receive_spawn_input(client_socket)
             if enemy_spawn != None:
                 enemyx = enemy_spawn[0]
                 enemyy = enemy_spawn[1]
@@ -338,8 +339,8 @@ def second_player_main():
         screen.fill(BG_COLOR)
         screen.blit(background, (-camerax, -cameray))
 
-        world_report = receive_world_report(connection)
-        send_spawn_input(enemy_spawn, connection)
+        world_report = network.receive_world_report(connection)
+        network.send_spawn_input(enemy_spawn, connection)
 
         if world_report is None:
             print "Connection to Player 1 has Failed"
@@ -398,43 +399,6 @@ def second_player_main():
         pygame.display.flip()
         fpsclock.tick(FPS)
         pygame.display.set_caption('Vania ' + str(int(fpsclock.get_fps())))
-
-def send_world_report(world, socket):
-    """send the pertinent world information to the second player"""
-    world_report = {
-        "Simon": world.simon.rect,
-        "Health": world.simon.health,
-        "MP": world.mp,
-        "Time": world.time,
-        "Enemies": [],
-        "Winner": world.winner
-    }
-
-    for enemy in world.enemies:
-        enemy_summary = (enemy.__name__, enemy.rect)
-        world_report["Enemies"].append(enemy_summary)
-
-    socket.sendall(pickle.dumps(world_report))
-
-def receive_world_report(connection):
-    """receive the pertinent world informtion from the first player"""
-    data = connection.recv(1024)
-    if not data:
-        return None
-    else:
-        return pickle.loads(str(data))
-
-def send_spawn_input(enemy_spawn_summary, socket):
-    """send spawn inputs to the first player"""
-    socket.sendall(pickle.dumps(enemy_spawn_summary))
-
-def receive_spawn_input(connection):
-    """recieve possible spawn inputs from the second player"""
-    data = connection.recv(1024)
-    if not data:
-        return None
-    else:
-        return pickle.loads(str(data))
 
 def youwin(screen, socket):
     blit_large_label(screen, "You Win!")
