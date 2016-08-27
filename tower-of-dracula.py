@@ -57,6 +57,7 @@ def first_player_main():
     pygame.mixer.music.load("assets/music/vamp.mp3")
     pygame.mixer.music.play(-1)
 
+    client_socket = None
     if is_multiplayer:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((server_ip, server_port))
