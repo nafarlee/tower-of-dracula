@@ -6,13 +6,16 @@ class Ghoul(Actor):
     """Class that represents Ghouls in the game world"""
 
     cost = 10
+    spritesheet = [
+        pygame.image.load("assets/ghoul/ghoul1.png"),
+        pygame.image.load("assets/ghoul/ghoul2.png")
+    ]
+    hitboxoffset = 0
+
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self)
-        self.image1 = pygame.image.load("assets/ghoul/ghoul1.png")
-        self.image2 = pygame.image.load("assets/ghoul/ghoul2.png")
-        self.image = self.image1
-        self.hitboxoffset = 0
+        self.image = self.spritesheet[0]
         self.is_grounded = False
         self.is_vector_set = False
         self.xvector = 0
@@ -24,7 +27,7 @@ class Ghoul(Actor):
         """Enemy AI processing"""
         self.movx = 0
         self.movy = 0
-        self.image = self.image1
+        self.image = self.spritesheet[0]
 
         if self.is_grounded:
             if self.is_vector_set:
@@ -58,9 +61,9 @@ class Ghoul(Actor):
 
         f = self.frame / 15
         if f == 1 or f == 3:
-            self.image = self.image1
+            self.image = self.spritesheet[0]
         else:
-            self.image = self.image2
+            self.image = self.spritesheet[1]
 
         if self.movx < 0:
             self.direction = "Left"
