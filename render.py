@@ -1,7 +1,7 @@
 import pygame
 
 def blit_large_label(screen, message):
-    print screen
+    """Display a large heading in the center of the game screen"""
     font_size = 100
     width, height = screen.get_size()
     labelx = width/3 - font_size
