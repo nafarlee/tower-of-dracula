@@ -12,8 +12,7 @@ class Ghoul(Actor):
     ]
     hitboxoffset = 0
 
-
-    def __init__(self, xpos, ypos):
+    def __init__(self, x_position, y_position):
         Actor.__init__(self)
         self.image = self.spritesheet[0]
         self.is_grounded = False
@@ -21,7 +20,11 @@ class Ghoul(Actor):
         self.xvector = 0
         self.__name__ = "Ghoul"
 
-        self.rect = pygame.Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
+        left = x_position + self.hitboxoffset-32/2
+        top = y_position - 61/2
+        width = 32
+        height = 61
+        self.rect = pygame.Rect(left, top, width, height)
 
     def render(self):
         if self.frame > 0:
