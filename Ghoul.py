@@ -23,6 +23,27 @@ class Ghoul(Actor):
 
         self.rect = pygame.Rect(xpos+self.hitboxoffset-32/2, ypos-61/2, 32, 61)
 
+    def render(self):
+        if self.frame > 0:
+            self.frame -= 1
+        else:
+            self.frame = self.FPS
+
+        f = self.frame / 15
+        if f == 1 or f == 3:
+            self.image = self.spritesheet[0]
+        else:
+            self.image = self.spritesheet[1]
+
+        if self.movx < 0:
+            self.direction = "Left"
+        elif self.movx > 0:
+            self.direction = "Right"
+
+        if self.direction == "Right":
+            self.image = pygame.transform.flip(self.image, True, False)
+
+
     def update(self, world):
         """Enemy AI processing"""
         self.movx = 0
@@ -54,21 +75,4 @@ class Ghoul(Actor):
         self.rect.x += self.movx
         self.rect.y += self.movy
 
-        if self.frame > 0:
-            self.frame -= 1
-        else:
-            self.frame = self.FPS
-
-        f = self.frame / 15
-        if f == 1 or f == 3:
-            self.image = self.spritesheet[0]
-        else:
-            self.image = self.spritesheet[1]
-
-        if self.movx < 0:
-            self.direction = "Left"
-        elif self.movx > 0:
-            self.direction = "Right"
-
-        if self.direction == "Right":
-            self.image = pygame.transform.flip(self.image, True, False)
+        self.render()
