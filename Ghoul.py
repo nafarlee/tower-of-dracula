@@ -20,10 +20,9 @@ class Ghoul(Actor):
         self.is_vector_set = False
         self.xvector = 0
 
-        left = x_position + self.hitboxoffset-32/2
-        top = y_position - 61/2
-        width = 32
-        height = 61
+        (width, height) = self.image.get_size()
+        left = x_position - width / 2
+        top = y_position - height / 2
         self.rect = pygame.Rect(left, top, width, height)
 
     def render(self):
