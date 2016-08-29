@@ -11,6 +11,7 @@ class Ghoul(Actor):
         pygame.image.load("assets/ghoul/ghoul2.png")
     ]
     hitboxoffset = 0
+    __name__ = "Ghoul"
 
     def __init__(self, x_position, y_position):
         Actor.__init__(self)
@@ -18,7 +19,6 @@ class Ghoul(Actor):
         self.is_grounded = False
         self.is_vector_set = False
         self.xvector = 0
-        self.__name__ = "Ghoul"
 
         left = x_position + self.hitboxoffset-32/2
         top = y_position - 61/2
