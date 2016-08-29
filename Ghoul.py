@@ -26,13 +26,12 @@ class Ghoul(Actor):
         self.rect = pygame.Rect(left, top, width, height)
 
     def render(self):
-        if self.frame > 0:
-            self.frame -= 1
+        if self.frame == 30:
+            self.frame = 0
         else:
-            self.frame = self.FPS
+            self.frame = self.frame + 1
 
-        f = self.frame / 15
-        if f == 1 or f == 3:
+        if self.frame < 15:
             self.image = self.spritesheet[0]
         else:
             self.image = self.spritesheet[1]
@@ -44,7 +43,6 @@ class Ghoul(Actor):
 
         if self.direction == "Right":
             self.image = pygame.transform.flip(self.image, True, False)
-
 
     def update(self, world):
         """Enemy AI processing"""
