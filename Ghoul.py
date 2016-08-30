@@ -48,7 +48,6 @@ class Ghoul(Actor):
         """Enemy AI processing"""
         self.movx = 0
         self.movy = 0
-        self.image = self.spritesheet[0]
 
         if self.has_landed:
             if self.is_vector_set:
