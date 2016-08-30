@@ -68,6 +68,7 @@ class Ghoul(Actor):
             for box in world.obstacles:
                 if box.colliderect(newx, self.rect.y, self.rect.width, self.rect.height):
                     self.xvector *= -1
+                    break
 
         self.rect.move_ip(self.movx, self.movy)
         self.render()
