@@ -73,5 +73,5 @@ class Ghoul(Actor):
         self.rect.move_ip(self.movx, self.movy)
         self.render()
 
-class GhoulStates:
+class GhoulStates(object):
     DROPPING, LANDING, SHAMBLING = range(3)
