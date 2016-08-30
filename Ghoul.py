@@ -16,7 +16,7 @@ class Ghoul(Actor):
     def __init__(self, x_position, y_position):
         Actor.__init__(self)
         self.image = self.spritesheet[0]
-        self.is_grounded = False
+        self.has_landed = False
         self.is_vector_set = False
         self.xvector = 0
 
@@ -50,7 +50,7 @@ class Ghoul(Actor):
         self.movy = 0
         self.image = self.spritesheet[0]
 
-        if self.is_grounded:
+        if self.has_landed:
             if self.is_vector_set:
                 self.movx = self.xvector
             else:
@@ -70,7 +70,7 @@ class Ghoul(Actor):
             foot = self.rect.y + self.rect.height + 5
             for box in world.obstacles:
                 if box.collidepoint(self.rect.x + self.rect.width/2, foot):
-                    self.is_grounded = True
+                    self.has_landed = True
 
         self.rect.x += self.movx
         self.rect.y += self.movy
