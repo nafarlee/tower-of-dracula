@@ -16,8 +16,7 @@ class Ghoul(Actor):
     def __init__(self, x_position, y_position):
         Actor.__init__(self)
         self.image = self.spritesheet[0]
-        self.has_landed = False
-        self.is_vector_set = False
+        self.state = GhoulStates.DROPPING
         self.xvector = 0
 
         (width, height) = self.image.get_size()
@@ -49,29 +48,31 @@ class Ghoul(Actor):
         self.movx = 0
         self.movy = 0
 
-        if self.has_landed:
-            if self.is_vector_set:
-                self.movx = self.xvector
-            else:
-                if world.simon.rect.x < self.rect.x:
-                    self.xvector -= self.move
-                elif world.simon.rect.x > self.rect.x:
-                    self.xvector += self.move
-                self.is_vector_set = True
-
-            newx = self.rect.x + self.movx
-            for box in world.obstacles:
-                if box.colliderect(newx, self.rect.y, self.rect.width,
-                                   self.rect.height):
-                    self.xvector *= -1
-        else:
+        if self.state == GhoulStates.DROPPING:
             self.movy += world.gravity
             foot = self.rect.y + self.rect.height + 5
             for box in world.obstacles:
                 if box.collidepoint(self.rect.x + self.rect.width/2, foot):
-                    self.has_landed = True
+                    self.state = GhoulStates.LANDING
+
+        elif self.state == GhoulStates.LANDING:
+            if world.simon.rect.x < self.rect.x:
+                self.xvector -= self.move
+            elif world.simon.rect.x > self.rect.x:
+                self.xvector += self.move
+            self.state = GhoulStates.SHAMBLING
+
+        elif self.state == GhoulStates.SHAMBLING:
+            self.movx = self.xvector
+            newx = self.rect.x + self.movx
+            for box in world.obstacles:
+                if box.colliderect(newx, self.rect.y, self.rect.width, self.rect.height):
+                    self.xvector *= -1
 
         self.rect.x += self.movx
         self.rect.y += self.movy
 
         self.render()
+
+class GhoulStates:
+    DROPPING, LANDING, SHAMBLING = range(3)
