@@ -69,9 +69,7 @@ class Ghoul(Actor):
                 if box.colliderect(newx, self.rect.y, self.rect.width, self.rect.height):
                     self.xvector *= -1
 
-        self.rect.x += self.movx
-        self.rect.y += self.movy
-
+        self.rect.move_ip(self.movx, self.movy)
         self.render()
 
 class GhoulStates:
