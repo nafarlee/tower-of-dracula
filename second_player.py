@@ -81,7 +81,7 @@ def main(fps, bg_color, window_width, window_height):
                 if event.key == pygame.K_d:
                     is_panning_right = False
 
-            if event.type == MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 xpos = mousex + camerax
                 ypos = mousey + cameray
