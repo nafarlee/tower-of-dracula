@@ -6,8 +6,8 @@ Small multiplayer game based on a certain NES game. Player 1 assumes the role of
 Tested on:
 ==========
 
-- [Python](http://www.python.org/) 2.7.5
-- [Pygame](http://www.pygame.org/) 1.9.1
+- [Python](http://www.python.org/) 3.6.0
+- [Pygame](http://www.pygame.org/) 1.9.2
 
 For those on Linux, both of these packages can most likely be found in your distro's default repositories.
 
