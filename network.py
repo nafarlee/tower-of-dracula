@@ -1,4 +1,4 @@
-import cPickle as pickle
+import pickle
 
 def send_world_report(world, socket):
     """send the pertinent world information to the second player"""
@@ -23,7 +23,7 @@ def receive_world_report(connection):
     if not data:
         return None
     else:
-        return pickle.loads(str(data))
+        return pickle.loads(data)
 
 def send_spawn_input(enemy_spawn_summary, socket):
     """send spawn inputs to the first player"""
@@ -35,4 +35,4 @@ def receive_spawn_input(connection):
     if not data:
         return None
     else:
-        return pickle.loads(str(data))
+        return pickle.loads(data)
