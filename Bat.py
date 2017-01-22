@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from Actor import Actor
 
@@ -66,7 +67,7 @@ class Bat(Actor):
         else:
             self.frame = self.FPS
 
-        f = self.frame / 10
+        f = math.floor(self.frame / 10)
         if f == 1 or f == 4:
             self.image = self.image1
         elif f == 2 or f == 5:
