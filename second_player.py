@@ -12,10 +12,10 @@ import network
 def main(fps, bg_color, window_width, window_height):
     """Play the game as Dracula"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listen_port = int(raw_input("Enter the port number to listen on: "))
+    listen_port = int(input("Enter the port number to listen on: "))
     s.bind(('', listen_port))
     s.listen(1)
-    print "Waiting for connection now at", str(socket.gethostbyname(socket.gethostname()))
+    print("Waiting for connection now at", str(socket.gethostbyname(socket.gethostname())))
     connection = s.accept()[0]
 
     #init
@@ -81,7 +81,7 @@ def main(fps, bg_color, window_width, window_height):
                 if event.key == pygame.K_d:
                     is_panning_right = False
 
-            if event.type == MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 xpos = mousex + camerax
                 ypos = mousey + cameray
@@ -104,7 +104,7 @@ def main(fps, bg_color, window_width, window_height):
         network.send_spawn_input(enemy_spawn, connection)
 
         if world_report is None:
-            print "Connection to Player 1 has Failed"
+            print("Connection to Player 1 has Failed")
         else:
             simon_rect = world_report["Simon"]
             simon_health = world_report["Health"]

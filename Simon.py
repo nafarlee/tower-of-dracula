@@ -1,4 +1,5 @@
 import os
+import math
 
 import pygame
 
@@ -227,21 +228,21 @@ class Simon(Actor):
         if not self.is_standing and not self.is_jumping:
             if self.movx != 0:
 
-                f = world.frame / 15
+                f = math.floor(world.frame / 15)
                 if f == 1 or f == 3:
                     self.image = self.spritesheet["walk1.png"]
                 else:
                     self.image = self.spritesheet["walk2.png"]
 
         if self.is_climbing:
-            f = world.frame / 15
+            f = math.floor(world.frame / 15)
             if f == 1 or f == 3:
                 self.image = self.spritesheet["stairs1.png"]
             else:
                 self.image = self.spritesheet["stairs2.png"]
 
         if self.is_attacking:
-            f = self.attack_frame / 10 + 1
+            f = math.floor(self.attack_frame / 10) + 1
             if self.is_jumping:
                 self.image = self.spritesheet["jumpattack" + str(f) + ".png"]
             elif self.is_climbing:
