@@ -28,7 +28,7 @@ def choose_player_type():
     elif player_type[0] == 'd':
         return "second"
     else:
-        print "invalid choice"
+        print("invalid choice")
         return choose_player_type()
 
 if __name__ == "__main__":

@@ -104,7 +104,7 @@ def main(fps, bg_color, window_width, window_height):
         network.send_spawn_input(enemy_spawn, connection)
 
         if world_report is None:
-            print "Connection to Player 1 has Failed"
+            print("Connection to Player 1 has Failed")
         else:
             simon_rect = world_report["Simon"]
             simon_health = world_report["Health"]
