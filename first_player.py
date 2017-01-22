@@ -11,13 +11,13 @@ from Bat import Bat
 
 def main(fps, bg_color, window_width, window_height):
     """Play the game as Simon, with or without multiplayer"""
-    network_type = raw_input("Play multiplayer? y/n ")
+    network_type = input("Play multiplayer? y/n ")
 
     is_multiplayer = bool(network_type == 'y')
 
     if is_multiplayer:
-        server_ip = str(raw_input("Enter the ip address (eg 127.0.0.1): "))
-        server_port = int(raw_input("Enter the port number of the server: "))
+        server_ip = str(input("Enter the ip address (eg 127.0.0.1): "))
+        server_port = int(input("Enter the port number of the server: "))
         if server_ip == "":
             server_ip = "localhost"
 

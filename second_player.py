@@ -12,10 +12,10 @@ import network
 def main(fps, bg_color, window_width, window_height):
     """Play the game as Dracula"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listen_port = int(raw_input("Enter the port number to listen on: "))
+    listen_port = int(input("Enter the port number to listen on: "))
     s.bind(('', listen_port))
     s.listen(1)
-    print "Waiting for connection now at", str(socket.gethostbyname(socket.gethostname()))
+    print("Waiting for connection now at", str(socket.gethostbyname(socket.gethostname())))
     connection = s.accept()[0]
 
     #init
