@@ -7,6 +7,10 @@ class Bat(Actor):
     """Class the represents bats in the game world."""
 
     cost = 35
+    hitbox_offset = 0
+    swoop_delay = 120
+    swoop_initial_velocity = 5
+    swoop_acceleration = -.1
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self)
@@ -17,12 +21,8 @@ class Bat(Actor):
         ]
         self.image = self.images[0]
 
-        self.hitboxoffset = 0
-        self.rect = pygame.Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 50)
-        self.swoop = 120
-        self.swoop_frame = self.swoop
-        self.swoop_velocity = 5
-        self.swoop_decay = .1
+        self.rect = pygame.Rect(xpos+Bat.hitbox_offset-30/2, ypos-30/2, 30, 50)
+        self.frames_till_swoop = Bat.swoop_delay
         self.velocity = 0
         self.xvector = 0
         self.yvector = 0
@@ -34,13 +34,13 @@ class Bat(Actor):
         movy = 0
         self.image = self.images[0]
 
-        self.velocity = max(self.velocity - self.swoop_decay, 0)
+        self.velocity = max(self.velocity + Bat.swoop_acceleration, 0)
 
-        if self.swoop_frame > 0:
-            self.swoop_frame -= 1
+        if self.frames_till_swoop > 0:
+            self.frames_till_swoop -= 1
         else:
-            self.swoop_frame = self.swoop
-            self.velocity = self.swoop_velocity
+            self.frames_till_swoop = Bat.swoop_delay
+            self.velocity = Bat.swoop_initial_velocity
             self.yvector = world.simon.rect.y
 
             if world.simon.rect.x < self.rect.x:
