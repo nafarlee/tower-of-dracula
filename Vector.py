@@ -7,3 +7,8 @@ class Vector(object):
     
     def tuple(self):
         return (self.x, self.y)
+
+    def add(self, other_vector):
+        new_x = self.x + other_vector.x
+        new_y = self.y + other_vector.y
+        return Vector(new_x, new_y)
