@@ -1,0 +1,16 @@
+spawn python3 main.py
+set timeout -1
+
+expect "Enter desired window width: "
+send "800\r"
+
+expect "Enter desired window height: "
+send "600\r"
+
+expect "Would you like to play as Simon or Dracula? "
+send "Simon\r"
+
+expect "Play multiplayer? y/n "
+send "n\r"
+
+expect eof
