@@ -10,10 +10,12 @@ class Bat(Actor):
 
     def __init__(self, xpos, ypos):
         Actor.__init__(self)
-        self.image1 = pygame.image.load("assets/bat/bat1.png")
-        self.image2 = pygame.image.load("assets/bat/bat2.png")
-        self.image3 = pygame.image.load("assets/bat/bat3.png")
-        self.image = self.image1
+        self.images = [
+            pygame.image.load("assets/bat/bat1.png"),
+            pygame.image.load("assets/bat/bat2.png"),
+            pygame.image.load("assets/bat/bat3.png")
+        ]
+        self.image = self.images[0]
 
         self.hitboxoffset = 0
         self.rect = pygame.Rect(xpos+self.hitboxoffset-30/2, ypos-30/2, 30, 50)
@@ -30,7 +32,7 @@ class Bat(Actor):
         """enemy AI processing"""
         self.movx = 0
         self.movy = 0
-        self.image = self.image1
+        self.image = self.images[0]
 
         if self.velocity >= self.swoop_decay:
             self.velocity -= self.swoop_decay
@@ -69,11 +71,11 @@ class Bat(Actor):
 
         f = math.floor(self.frame / 10)
         if f == 1 or f == 4:
-            self.image = self.image1
+            self.image = self.images[0]
         elif f == 2 or f == 5:
-            self.image = self.image2
+            self.image = self.images[1]
         elif f == 3:
-            self.image = self.image3
+            self.image = self.images[2]
 
         if self.movx < 0:
             self.direction = "Left"
