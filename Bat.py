@@ -30,8 +30,8 @@ class Bat(Actor):
 
     def update(self, world):
         """enemy AI processing"""
-        self.movx = 0
-        self.movy = 0
+        movx = 0
+        movy = 0
         self.image = self.images[0]
 
         if self.velocity >= self.swoop_decay:
@@ -50,18 +50,18 @@ class Bat(Actor):
                 self.xvector = 1
 
         if self.xvector < 0:
-            self.movx -= self.velocity
+            movx -= self.velocity
         elif self.xvector > 0:
-            self.movx += self.velocity
+            movx += self.velocity
 
         if self.yvector <= self.rect.y:
             self.yvector -= 5
-            self.movy -= self.velocity
+            movy -= self.velocity
         elif self.yvector > self.rect.y:
-            self.movy += self.velocity
+            movy += self.velocity
 
-        self.rect.x += self.movx
-        self.rect.y += self.movy
+        self.rect.x += movx
+        self.rect.y += movy
 
 
         if self.frame > 0:
@@ -77,9 +77,9 @@ class Bat(Actor):
         elif f == 3:
             self.image = self.images[2]
 
-        if self.movx < 0:
+        if movx < 0:
             self.direction = "Left"
-        elif self.movx > 0:
+        elif movx > 0:
             self.direction = "Right"
 
         if self.direction == "Right":
