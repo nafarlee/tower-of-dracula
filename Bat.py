@@ -34,8 +34,7 @@ class Bat(Actor):
         movy = 0
         self.image = self.images[0]
 
-        if self.velocity >= self.swoop_decay:
-            self.velocity -= self.swoop_decay
+        self.velocity = max(self.velocity - self.swoop_decay, 0)
 
         if self.swoop_frame > 0:
             self.swoop_frame -= 1
