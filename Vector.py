@@ -26,3 +26,6 @@ class Vector(object):
 
     def is_zero(self):
         return self.x == 0 and self.y == 0
+
+    def reverse_y(self):
+        return Vector(self.x, -self.y)
