@@ -29,6 +29,31 @@ class Bat(Actor):
         self.yvector = 0
         self.__name__ = "Bat"
 
+    def _render(self, movx):
+        if self.frame > 0:
+            self.frame -= 1
+        else:
+            self.frame = Actor.FPS
+
+        f = math.floor(self.frame / 10)
+        image = self.images[0]
+        if f == 1 or f == 4:
+            image = self.images[0]
+        elif f == 2 or f == 5:
+            image = self.images[1]
+        elif f == 3:
+            image = self.images[2]
+
+        if movx < 0:
+            self.direction = "Left"
+        elif movx > 0:
+            self.direction = "Right"
+
+        if self.direction == "Right":
+            image = pygame.transform.flip(image, True, False)
+
+        return image
+
     def update(self, world):
         """enemy AI processing"""
         movx = 0
@@ -50,37 +75,17 @@ class Bat(Actor):
                 self.xvector = 1
 
         if self.xvector < 0:
-            movx -= self.velocity
+            movx = -self.velocity
         elif self.xvector > 0:
-            movx += self.velocity
+            movx = self.velocity
 
         if self.yvector <= self.rect.y:
             self.yvector -= 5
-            movy -= self.velocity
-        elif self.yvector > self.rect.y:
-            movy += self.velocity
+            movy = -self.velocity
+        else:
+            movy = +self.velocity
 
         self.rect.x += movx
         self.rect.y += movy
 
-
-        if self.frame > 0:
-            self.frame -= 1
-        else:
-            self.frame = self.FPS
-
-        f = math.floor(self.frame / 10)
-        if f == 1 or f == 4:
-            self.image = self.images[0]
-        elif f == 2 or f == 5:
-            self.image = self.images[1]
-        elif f == 3:
-            self.image = self.images[2]
-
-        if movx < 0:
-            self.direction = "Left"
-        elif movx > 0:
-            self.direction = "Right"
-
-        if self.direction == "Right":
-            self.image = pygame.transform.flip(self.image, True, False)
+        self.image = self._render(movx)
