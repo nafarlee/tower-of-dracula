@@ -23,3 +23,6 @@ class Vector(object):
         new_x = max(self.x + acceleration.x, 0)
         new_y = max(self.y + acceleration.y, 0)
         return Vector(new_x, new_y)
+
+    def is_zero(self):
+        return self.x == 0 and self.y == 0
