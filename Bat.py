@@ -28,7 +28,12 @@ class Bat(Actor):
         self.yvector = 0
         self.__name__ = "Bat"
 
-    def _swoop(self, simon_rect):
+    def update(self, world):
+        """enemy AI processing"""
+        movx = 0
+        movy = 0
+        self.image = self.images[0]
+
         self.velocity = max(self.velocity + Bat.swoop_acceleration, 0)
 
         if self.frames_till_swoop > 0:
@@ -36,21 +41,12 @@ class Bat(Actor):
         else:
             self.frames_till_swoop = Bat.swoop_delay
             self.velocity = Bat.swoop_initial_velocity
-            self.yvector = simon_rect.y
+            self.yvector = world.simon.rect.y
 
-            if simon_rect.x < self.rect.x:
+            if world.simon.rect.x < self.rect.x:
                 self.xvector = -1
             else:
                 self.xvector = 1
-
-
-    def update(self, world):
-        """enemy AI processing"""
-        movx = 0
-        movy = 0
-        self.image = self.images[0]
-
-        self._swoop(world.simon.rect)
 
         if self.xvector < 0:
             movx -= self.velocity
