@@ -12,3 +12,6 @@ class Vector(object):
         new_x = self.x + other_vector.x
         new_y = self.y + other_vector.y
         return Vector(new_x, new_y)
+
+    def squared(self):
+        return self.x^2 + self.y^2
