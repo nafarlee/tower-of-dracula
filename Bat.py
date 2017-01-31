@@ -93,7 +93,5 @@ class Bat(Actor):
             else:
                 self.xvector = 1
 
-
         self.rect.move_ip(movx, movy)
-
         self.image = self._render(movx)
