@@ -13,7 +13,8 @@ class Bat(Actor):
     swoop_acceleration = -.1
 
     def __init__(self, xpos, ypos):
-        Actor.__init__(self)
+        super().__init__()
+
         self.images = [
             pygame.image.load("assets/bat/bat1.png"),
             pygame.image.load("assets/bat/bat2.png"),
