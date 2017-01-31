@@ -4,7 +4,7 @@ import math
 from Actor import Actor
 
 class Bat(Actor):
-    """Class the represents bats in the game world."""
+    """The class that represents bats in the game world."""
 
     cost = 35
     hitbox_offset = 0
