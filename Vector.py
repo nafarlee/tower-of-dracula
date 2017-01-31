@@ -29,3 +29,6 @@ class Vector(object):
 
     def reverse_y(self):
         return Vector(self.x, -self.y)
+
+    def reverse_x(self):
+        return Vector(-self.x, self.y)
