@@ -74,6 +74,11 @@ class Bat(Actor):
             else:
                 movy = +self.velocity
 
+            if self.xvector < 0:
+                movx = -self.velocity
+            elif self.xvector > 0:
+                movx = self.velocity
+
         else:
             if self.frames_till_swoop > 0:
                 self.frames_till_swoop -= 1
@@ -88,10 +93,6 @@ class Bat(Actor):
             else:
                 self.xvector = 1
 
-        if self.xvector < 0:
-            movx = -self.velocity
-        elif self.xvector > 0:
-            movx = self.velocity
 
         self.rect.move_ip(movx, movy)
 
