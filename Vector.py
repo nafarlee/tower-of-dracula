@@ -15,3 +15,6 @@ class Vector(object):
 
     def squared(self):
         return self.x^2 + self.y^2
+
+    def absolute(self):
+        return Vector(abs(self.x), abs(self.y))
