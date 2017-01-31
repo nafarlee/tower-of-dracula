@@ -8,7 +8,7 @@ class Bat(Actor):
 
     cost = 35
     hitbox_offset = 0
-    swoop_delay = 120
+    swoop_delay = 100
     swoop_initial_velocity = 5
     swoop_acceleration = -.1
 
