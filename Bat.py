@@ -27,6 +27,7 @@ class Bat(Actor):
         self.velocity = 0
         self.xvector = 0
         self.yvector = 0
+        self.is_swooping = False
         self.__name__ = "Bat"
 
     def _render(self, movx):
@@ -60,13 +61,18 @@ class Bat(Actor):
         movy = 0
         self.image = self.images[0]
 
-        self.velocity = max(self.velocity + Bat.swoop_acceleration, 0)
-
-        if self.frames_till_swoop > 0:
-            self.frames_till_swoop -= 1
+        if self.is_swooping:
+            self.velocity = max(self.velocity + Bat.swoop_acceleration, 0)
+            if self.velocity == 0:
+                self.is_swooping = False
+                self.frames_till_swoop = Bat.swoop_delay
         else:
-            self.frames_till_swoop = Bat.swoop_delay
-            self.velocity = Bat.swoop_initial_velocity
+            if self.frames_till_swoop > 0:
+                self.frames_till_swoop -= 1
+            else:
+                self.is_swooping = True
+                self.velocity = Bat.swoop_initial_velocity
+
             self.yvector = world.simon.rect.y
 
             if world.simon.rect.x < self.rect.x:
