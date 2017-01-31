@@ -93,7 +93,6 @@ class Bat(Actor):
         elif self.xvector > 0:
             movx = self.velocity
 
-        self.rect.x += movx
-        self.rect.y += movy
+        self.rect.move_ip(movx, movy)
 
         self.image = self._render(movx)
