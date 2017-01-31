@@ -26,7 +26,7 @@ class Bat(Actor):
         self.frames_till_swoop = Bat.swoop_delay
         self.velocity = 0
         self.xvector = 0
-        self.yvector = 0
+        self.simon_y = 0
         self.is_swooping = False
         self.__name__ = "Bat"
 
@@ -73,7 +73,7 @@ class Bat(Actor):
                 self.is_swooping = True
                 self.velocity = Bat.swoop_initial_velocity
 
-            self.yvector = world.simon.rect.y
+            self.simon_y = world.simon.rect.y
 
             if world.simon.rect.x < self.rect.x:
                 self.xvector = -1
@@ -85,8 +85,8 @@ class Bat(Actor):
         elif self.xvector > 0:
             movx = self.velocity
 
-        if self.yvector <= self.rect.y:
-            self.yvector -= 5
+        if self.simon_y <= self.rect.y:
+            self.simon_y -= 5
             movy = -self.velocity
         else:
             movy = +self.velocity
