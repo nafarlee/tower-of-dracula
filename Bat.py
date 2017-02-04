@@ -11,8 +11,8 @@ class Bat(Actor):
     hitbox_width = 30
     hitbox_offset = 0
     swoop_delay = 100
-    swoop_initial_velocity = 5
-    swoop_acceleration = -.1
+    swoop_initial_velocity = Vector(5, 5)
+    swoop_acceleration = Vector(-.1, -.1)
 
     def __init__(self, xpos, ypos):
         super().__init__()
@@ -26,10 +26,10 @@ class Bat(Actor):
 
         self.rect = pygame.Rect(xpos+Bat.hitbox_offset-30/2, ypos-30/2, hitbox_width, hitbox_height)
         self.frames_till_swoop = Bat.swoop_delay
-        self.velocity = 0
-        self.xvector = 0
-        self.simon_y = 0
+        self.velocity = Vector(0, 0)
+        self.target = Vector(0, 0)
         self.is_swooping = False
+        self.has_target
         self.__name__ = "Bat"
 
     def _render(self, movx):
