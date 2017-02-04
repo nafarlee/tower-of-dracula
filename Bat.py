@@ -80,3 +80,17 @@ class Bat(Actor):
 
     def update(self, world):
         """enemy AI processing"""
+        if not self.is_swooping:
+            self.frames_till_swoop -= 1
+            if self.frames_till_swoop <= 0:
+                self._initiate_swoop(world.simon.rect)
+        else:
+            self.velocity = self.velocity.add(Bat.swoop_acceleration).bound(Vector(0, 0))
+            if self.rect.y >= world.simon.rect.y and not self.has_pitched:
+                self._pitch_swoop()
+            if self.velocity.is_zero():
+                self._finish_swoop()
+
+        movement = self.velocity.pointwise_product(self.direction)
+        self.rect.move_ip(movement.x, movement.y)
+        self.image = self._render(movement.x)
