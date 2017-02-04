@@ -28,10 +28,10 @@ class Bat(Actor):
         self.rect = pygame.Rect(xpos-30/2, ypos-30/2, Bat.hitbox_width, Bat.hitbox_height)
         self.frames_till_swoop = Bat.swoop_delay
         self.velocity = Vector(0, 0)
-        self.target = Vector(0, 0)
+        self.direction = Vector(1, 1)
         self.orientation = "Left"
+        self.has_pitched = False
         self.is_swooping = False
-        self.has_target
         self.__name__ = "Bat"
 
     def _render(self, movx):
@@ -58,6 +58,14 @@ class Bat(Actor):
             image = pygame.transform.flip(image, True, False)
 
         return image
+
+    def _initiate_swoop(self, simon_rect):
+        self.is_swooping = True
+        self.velocity = Bat.swoop_initial_velocity
+        x_direction = 1 if self.rect.x <= simon_rect.x else -1
+        y_direction = 1 if self.rect.y <= simon_rect.y else -1
+        self.direction = Vector(x_direction, y_direction)
+        self.has_pitched = False if y_direction == 1 else True
 
     def update(self, world):
         """enemy AI processing"""
