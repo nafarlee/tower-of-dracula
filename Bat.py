@@ -67,5 +67,12 @@ class Bat(Actor):
         self.direction = Vector(x_direction, y_direction)
         self.has_pitched = False if y_direction == 1 else True
 
+    def _finish_swoop(self):
+        self.is_swooping = False
+        self.has_pitched = False
+        self.target = None
+        self.frames_till_swoop = Bat.swoop_delay
+        self.direction = Vector(1, 1)
+
     def update(self, world):
         """enemy AI processing"""
