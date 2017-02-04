@@ -25,7 +25,7 @@ class Bat(Actor):
         ]
         self.image = self.images[0]
 
-        self.rect = pygame.Rect(xpos+Bat.hitbox_offset-30/2, ypos-30/2, hitbox_width, hitbox_height)
+        self.rect = pygame.Rect(xpos-30/2, ypos-30/2, Bat.hitbox_width, Bat.hitbox_height)
         self.frames_till_swoop = Bat.swoop_delay
         self.velocity = Vector(0, 0)
         self.target = Vector(0, 0)
