@@ -1,3 +1,5 @@
+import copy
+
 class Vector(object):
     """Represents a 2D vector"""
 
@@ -30,3 +32,17 @@ class Vector(object):
 
     def reverse_x(self):
         return Vector(-self.x, self.y)
+
+    def bound(self, lower_bound=None, upper_bound=None):
+        new_vector = copy.copy(self)
+        if lower_bound != None:
+            if new_vector.x < lower_bound.x:
+                new_vector.x = lower_bound.x
+            if new_vector.y < lower_bound.y:
+                new_vector.y = lower_bound.y
+        if upper_bound != None:
+            if new_vector.x > upper_bound.y:
+                new_vector.y = upper_bound.y
+            if new_vector.y > upper_bound.y:
+                new_vector.y = upper_bound.y
+        return new_vector
