@@ -7,6 +7,8 @@ class Bat(Actor):
     """The class that represents bats in the game world."""
 
     cost = 35
+    hitbox_height = 50
+    hitbox_width = 30
     hitbox_offset = 0
     swoop_delay = 100
     swoop_initial_velocity = 5
@@ -22,7 +24,7 @@ class Bat(Actor):
         ]
         self.image = self.images[0]
 
-        self.rect = pygame.Rect(xpos+Bat.hitbox_offset-30/2, ypos-30/2, 30, 50)
+        self.rect = pygame.Rect(xpos+Bat.hitbox_offset-30/2, ypos-30/2, hitbox_width, hitbox_height)
         self.frames_till_swoop = Bat.swoop_delay
         self.velocity = 0
         self.xvector = 0
