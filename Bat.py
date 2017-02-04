@@ -3,6 +3,7 @@ import math
 
 from Actor import Actor
 from Vector import Vector
+import linear_state_machine as lsm
 
 class Bat(Actor):
     """The class that represents bats in the game world."""
@@ -25,6 +26,15 @@ class Bat(Actor):
         ]
         self.image = self.images[0]
 
+        self.sprite_loop = lsm.create({
+            0: self.images[1],
+            10: self.images[0],
+            20: self.images[2],
+            30: self.images[1],
+            40: self.images[0],
+            60: lsm.end
+        })
+
         self.rect = pygame.Rect(xpos-30/2, ypos-30/2, Bat.hitbox_width, Bat.hitbox_height)
         self.frames_till_swoop = Bat.swoop_delay
         self.velocity = Vector(0, 0)
@@ -40,14 +50,7 @@ class Bat(Actor):
         else:
             self.frame = Actor.FPS
 
-        f = math.floor(self.frame / 10)
-        image = self.images[0]
-        if f == 1 or f == 4:
-            image = self.images[0]
-        elif f == 2 or f == 5:
-            image = self.images[1]
-        elif f == 3:
-            image = self.images[2]
+        image = next(self.sprite_loop)
 
         if movx < 0:
             self.orientation = "Left"
