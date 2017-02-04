@@ -28,6 +28,7 @@ class Bat(Actor):
         self.frames_till_swoop = Bat.swoop_delay
         self.velocity = Vector(0, 0)
         self.target = Vector(0, 0)
+        self.orientation = "Left"
         self.is_swooping = False
         self.has_target
         self.__name__ = "Bat"
@@ -48,11 +49,11 @@ class Bat(Actor):
             image = self.images[2]
 
         if movx < 0:
-            self.direction = "Left"
+            self.orientation = "Left"
         elif movx > 0:
-            self.direction = "Right"
+            self.orientation = "Right"
 
-        if self.direction == "Right":
+        if self.orientation == "Right":
             image = pygame.transform.flip(image, True, False)
 
         return image
