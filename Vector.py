@@ -5,6 +5,9 @@ class Vector(object):
         self.x = x
         self.y = y
 
+    def __str__(self):
+        return "< {} {} >".format(self.x, self.y)
+
     def tuple(self):
         return (self.x, self.y)
 
