@@ -2,6 +2,7 @@ import pygame
 import math
 
 from Actor import Actor
+from Vector import Vector
 
 class Bat(Actor):
     """The class that represents bats in the game world."""
