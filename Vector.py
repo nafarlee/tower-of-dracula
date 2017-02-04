@@ -33,6 +33,9 @@ class Vector(object):
     def reverse_x(self):
         return Vector(-self.x, self.y)
 
+    def pointwise_product(self, other):
+        return Vector(self.x * other.x, self.y * other.y)
+
     def bound(self, lower_bound=None, upper_bound=None):
         new_vector = copy.copy(self)
         if lower_bound != None:
