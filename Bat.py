@@ -15,25 +15,24 @@ class Bat(Actor):
     swoop_delay = 100
     swoop_initial_velocity = Vector(5, 5)
     swoop_acceleration = Vector(-.1, -.1)
+    images = [
+        pygame.image.load("assets/bat/bat1.png"),
+        pygame.image.load("assets/bat/bat2.png"),
+        pygame.image.load("assets/bat/bat3.png")
+    ]
     __name__ = "Bat"
 
     def __init__(self, xpos, ypos):
         super().__init__()
         self.__name__ = Bat.__name__
-
-        self.images = [
-            pygame.image.load("assets/bat/bat1.png"),
-            pygame.image.load("assets/bat/bat2.png"),
-            pygame.image.load("assets/bat/bat3.png")
-        ]
-        self.image = self.images[0]
+        self.image = Bat.images[0]
 
         self.sprite_loop = lsm.create({
-            0: self.images[1],
-            10: self.images[0],
-            20: self.images[2],
-            30: self.images[1],
-            40: self.images[0],
+            0: Bat.images[1],
+            10: Bat.images[0],
+            20: Bat.images[2],
+            30: Bat.images[1],
+            40: Bat.images[0],
             60: lsm.end
         })
 
