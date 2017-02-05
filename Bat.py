@@ -45,11 +45,6 @@ class Bat(Actor):
         self.__name__ = "Bat"
 
     def _render(self, movx):
-        if self.frame > 0:
-            self.frame -= 1
-        else:
-            self.frame = Actor.FPS
-
         image = next(self.sprite_loop)
 
         if movx < 0:
