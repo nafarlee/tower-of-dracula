@@ -64,7 +64,6 @@ class Bat(Actor):
         self.has_pitched = False
         self.target = None
         self.frames_till_swoop = Bat.swoop_delay
-        self.direction = Vector(1, 1)
 
     def _pitch_swoop(self):
         self.direction = self.direction.reverse_y()
