@@ -15,9 +15,11 @@ class Bat(Actor):
     swoop_delay = 100
     swoop_initial_velocity = Vector(5, 5)
     swoop_acceleration = Vector(-.1, -.1)
+    __name__ = "Bat"
 
     def __init__(self, xpos, ypos):
         super().__init__()
+        self.__name__ = Bat.__name__
 
         self.images = [
             pygame.image.load("assets/bat/bat1.png"),
@@ -42,7 +44,6 @@ class Bat(Actor):
         self.orientation = "Left"
         self.has_pitched = False
         self.is_swooping = False
-        self.__name__ = "Bat"
 
     def _render(self, movx):
         image = next(self.sprite_loop)
