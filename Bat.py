@@ -43,7 +43,7 @@ class Bat(Actor):
         self.has_pitched = False
         self.is_swooping = False
 
-    def _render(self, movx):
+    def _render(self):
         image = next(self.sprite_loop)
 
         if self.direction.x > 0:
@@ -83,4 +83,4 @@ class Bat(Actor):
 
         movement = self.velocity.pointwise_product(self.direction)
         self.rect.move_ip(movement.x, movement.y)
-        self.image = self._render(movement.x)
+        self.image = self._render()
