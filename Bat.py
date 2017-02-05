@@ -62,7 +62,6 @@ class Bat(Actor):
     def _finish_swoop(self):
         self.is_swooping = False
         self.has_pitched = False
-        self.target = None
         self.frames_till_swoop = Bat.swoop_delay
 
     def _pitch_swoop(self):
