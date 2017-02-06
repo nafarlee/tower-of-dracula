@@ -30,7 +30,7 @@ class Ghoul(Actor):
         top = y_position - height / 2
         self.rect = pygame.Rect(left, top, width, height)
 
-    def render(self, x_velocity):
+    def _render(self, x_velocity):
         image = next(self.sprite_loop)
 
         if x_velocity < 0:
@@ -71,7 +71,7 @@ class Ghoul(Actor):
                     break
 
         self.rect.move_ip(self.movx, self.movy)
-        self.render(self.movx)
+        self._render(self.movx)
 
 class GhoulStates(object):
     DROPPING, LANDING, SHAMBLING = range(3)
