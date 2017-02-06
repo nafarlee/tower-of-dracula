@@ -1,6 +1,7 @@
 import pygame
 
 from Actor import Actor
+import linear_state_machine as lsm
 
 class Ghoul(Actor):
     """Class that represents Ghouls in the game world"""
@@ -18,6 +19,11 @@ class Ghoul(Actor):
         self.image = self.spritesheet[0]
         self.state = GhoulStates.DROPPING
         self.xvector = 0
+        self.sprite_loop = lsm.create({
+            0: Ghoul.spritesheet[0],
+            15: Ghoul.spritesheet[1],
+            30: lsm.end
+        })
 
         (width, height) = self.image.get_size()
         left = x_position - width / 2
@@ -25,15 +31,7 @@ class Ghoul(Actor):
         self.rect = pygame.Rect(left, top, width, height)
 
     def render(self):
-        if self.frame == 30:
-            self.frame = 0
-        else:
-            self.frame = self.frame + 1
-
-        if self.frame < 15:
-            self.image = self.spritesheet[0]
-        else:
-            self.image = self.spritesheet[1]
+        image = next(self.sprite_loop)
 
         if self.movx < 0:
             self.direction = "Left"
@@ -41,7 +39,9 @@ class Ghoul(Actor):
             self.direction = "Right"
 
         if self.direction == "Right":
-            self.image = pygame.transform.flip(self.image, True, False)
+            image = pygame.transform.flip(image, True, False)
+
+        self.image = image
 
     def update(self, world):
         """Enemy AI processing"""
